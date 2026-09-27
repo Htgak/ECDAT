@@ -1,0 +1,173 @@
+# Python source crypto detection rules
+
+- id: PY-RSA-001
+  version: "1.0"
+  name: RSA key generation (cryptography library)
+  severity: policy-dependent
+  confidence: confirmed
+  conditions:
+    language: python
+    patterns:
+      - type: function_call
+        module: cryptography.hazmat.primitives.asymmetric.rsa
+        function: generate_private_key
+
+- id: PY-RSA-002
+  version: "1.0"
+  name: RSA public key loading
+  severity: info
+  confidence: confirmed
+  conditions:
+    language: python
+    patterns:
+      - type: function_call
+        module: cryptography.hazmat.primitives.serialization
+        function: load_pem_public_key
+
+- id: PY-RSA-003
+  version: "1.0"
+  name: RSA private key loading
+  severity: high
+  confidence: confirmed
+  conditions:
+    language: python
+    patterns:
+      - type: function_call
+        module: cryptography.hazmat.primitives.serialization
+        function: load_pem_private_key
+
+- id: PY-EC-001
+  version: "1.0"
+  name: EC key generation (cryptography library)
+  severity: policy-dependent
+  confidence: confirmed
+  conditions:
+    language: python
+    patterns:
+      - type: function_call
+        module: cryptography.hazmat.primitives.asymmetric.ec
+        function: generate_private_key
+
+- id: PY-AES-001
+  version: "1.0"
+  name: AES cipher instantiation
+  severity: info
+  confidence: confirmed
+  conditions:
+    language: python
+    patterns:
+      - type: class_instantiation
+        module: cryptography.hazmat.primitives.ciphers.algorithms
+        class: AES
+
+- id: PY-CHACHA-001
+  version: "1.0"
+  name: ChaCha20 cipher instantiation
+  severity: info
+  confidence: confirmed
+  conditions:
+    language: python
+    patterns:
+      - type: class_instantiation
+        module: cryptography.hazmat.primitives.ciphers.algorithms
+        class: ChaCha20
+
+- id: PY-SHA-001
+  version: "1.0"
+  name: SHA-1 hash use
+  severity: high
+  confidence: confirmed
+  conditions:
+    language: python
+    patterns:
+      - type: class_instantiation
+        module: cryptography.hazmat.primitives.hashes
+        class: SHA1
+    metadata:
+      deprecated: true
+
+- id: PY-SHA-002
+  version: "1.0"
+  name: SHA-256 hash use
+  severity: info
+  confidence: confirmed
+  conditions:
+    language: python
+    patterns:
+      - type: class_instantiation
+        module: cryptography.hazmat.primitives.hashes
+        class: SHA256
+
+- id: PY-MD5-001
+  version: "1.0"
+  name: MD5 hash use (hashlib)
+  severity: critical
+  confidence: confirmed
+  conditions:
+    language: python
+    patterns:
+      - type: function_call
+        module: hashlib
+        function: md5
+    metadata:
+      deprecated: true
+
+- id: PY-HMAC-001
+  version: "1.0"
+  name: HMAC instantiation
+  severity: info
+  confidence: confirmed
+  conditions:
+    language: python
+    patterns:
+      - type: class_instantiation
+        module: cryptography.hazmat.primitives.hmac
+        class: HMAC
+
+- id: PY-PBKDF2-001
+  version: "1.0"
+  name: PBKDF2 key derivation
+  severity: info
+  confidence: confirmed
+  conditions:
+    language: python
+    patterns:
+      - type: class_instantiation
+        module: cryptography.hazmat.primitives.kdf.pbkdf2
+        class: PBKDF2HMAC
+
+- id: PY-HKDF-001
+  version: "1.0"
+  name: HKDF key derivation
+  severity: info
+  confidence: confirmed
+  conditions:
+    language: python
+    patterns:
+      - type: class_instantiation
+        module: cryptography.hazmat.primitives.kdf.hkdf
+        class: HKDF
+
+- id: PY-PYCRYPTODOME-001
+  version: "1.0"
+  name: PyCryptodome import
+  severity: info
+  confidence: probable
+  conditions:
+    language: python
+    patterns:
+      - type: import
+        module_prefix: Crypto
+
+- id: PY-KEYMATERIAL-001
+  version: "1.0"
+  name: Hardcoded PEM key material
+  severity: critical
+  confidence: probable
+  conditions:
+    language: python
+    patterns:
+      - type: string_literal
+        pattern_regex: "-----BEGIN (RSA |EC |PRIVATE |PUBLIC )?KEY-----"
+    metadata:
+      note: Review required — may be test fixtures.

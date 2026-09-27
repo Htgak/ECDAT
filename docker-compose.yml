@@ -1,0 +1,72 @@
+# =============================================================================
+# ECDAT — Docker Compose Stack
+# Cryptographic Discovery, Risk Assessment & CBOM Export Platform
+# Services: FastAPI Backend, Nginx + React Frontend
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # 1. FastAPI Backend API
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./ecdat-backend
+      dockerfile: Dockerfile
+    image: ecdat-backend:latest
+    container_name: ecdat-backend
+    command: uv run uvicorn ecdat.apps.api.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - evidence_store:/evidence_store
+      - ./ecdat-backend/ecdat:/app/ecdat
+    environment:
+      EVIDENCE_STORE_PATH: /evidence_store
+      ENVIRONMENT: ${ENVIRONMENT:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      ECDAT_DEBUG: ${ECDAT_DEBUG:-false}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-["localhost","127.0.0.1","backend"]}
+      CORS_ORIGINS: ${CORS_ORIGINS:-["http://localhost:3000","http://127.0.0.1:3000","http://localhost:5173","http://127.0.0.1:5173","http://localhost:8000","http://127.0.0.1:8000"]}
+      AUTH_USERNAME: ${AUTH_USERNAME:-admin}
+      AUTH_PASSWORD: ${AUTH_PASSWORD:-}
+      AUTH_USERS: ${AUTH_USERS:-}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - ecdat-network
+
+  # ---------------------------------------------------------------------------
+  # 2. React Frontend (Nginx Reverse Proxy & Static Asset Host)
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./ecdat-web
+      dockerfile: Dockerfile
+    image: ecdat-web:latest
+    container_name: ecdat-frontend
+    ports:
+      - "127.0.0.1:${FRONTEND_ALT_PORT:-3000}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - ecdat-network
+
+# =============================================================================
+# Volumes & Networks
+# =============================================================================
+volumes:
+  evidence_store:
+    driver: local
+
+networks:
+  ecdat-network:
+    driver: bridge
+    name: ecdat-network

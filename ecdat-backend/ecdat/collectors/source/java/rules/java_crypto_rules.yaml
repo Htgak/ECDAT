@@ -1,0 +1,170 @@
+# Java source crypto detection rules
+# Each rule defines conditions that trigger a finding.
+# Rules are versioned and immutable once used in a scan.
+
+- id: JAVA-RSA-001
+  version: "1.0"
+  name: RSA key pair generation
+  severity: policy-dependent
+  confidence: confirmed
+  conditions:
+    language: java
+    patterns:
+      - type: method_call
+        class: KeyPairGenerator
+        method: getInstance
+        algorithm_arg: "RSA"
+    metadata:
+      import_hint: java.security.KeyPairGenerator
+
+- id: JAVA-RSA-002
+  version: "1.0"
+  name: RSA cipher use
+  severity: policy-dependent
+  confidence: confirmed
+  conditions:
+    language: java
+    patterns:
+      - type: method_call
+        class: Cipher
+        method: getInstance
+        algorithm_arg_prefix: "RSA"
+    metadata:
+      import_hint: javax.crypto.Cipher
+
+- id: JAVA-AES-001
+  version: "1.0"
+  name: AES cipher use
+  severity: info
+  confidence: confirmed
+  conditions:
+    language: java
+    patterns:
+      - type: method_call
+        class: Cipher
+        method: getInstance
+        algorithm_arg_prefix: "AES"
+
+- id: JAVA-AES-002
+  version: "1.0"
+  name: AES key generation
+  severity: info
+  confidence: confirmed
+  conditions:
+    language: java
+    patterns:
+      - type: method_call
+        class: KeyGenerator
+        method: getInstance
+        algorithm_arg: "AES"
+
+- id: JAVA-ECDSA-001
+  version: "1.0"
+  name: EC key pair generation
+  severity: policy-dependent
+  confidence: confirmed
+  conditions:
+    language: java
+    patterns:
+      - type: method_call
+        class: KeyPairGenerator
+        method: getInstance
+        algorithm_arg: "EC"
+
+- id: JAVA-ECDSA-002
+  version: "1.0"
+  name: ECDSA signature
+  severity: policy-dependent
+  confidence: confirmed
+  conditions:
+    language: java
+    patterns:
+      - type: method_call
+        class: Signature
+        method: getInstance
+        algorithm_arg_contains: "ECDSA"
+
+- id: JAVA-SHA-001
+  version: "1.0"
+  name: SHA-1 message digest use
+  severity: high
+  confidence: confirmed
+  conditions:
+    language: java
+    patterns:
+      - type: method_call
+        class: MessageDigest
+        method: getInstance
+        algorithm_arg: "SHA-1"
+    metadata:
+      deprecated: true
+
+- id: JAVA-SHA-002
+  version: "1.0"
+  name: SHA-256 message digest use
+  severity: info
+  confidence: confirmed
+  conditions:
+    language: java
+    patterns:
+      - type: method_call
+        class: MessageDigest
+        method: getInstance
+        algorithm_arg: "SHA-256"
+
+- id: JAVA-MD5-001
+  version: "1.0"
+  name: MD5 message digest use
+  severity: critical
+  confidence: confirmed
+  conditions:
+    language: java
+    patterns:
+      - type: method_call
+        class: MessageDigest
+        method: getInstance
+        algorithm_arg: "MD5"
+    metadata:
+      deprecated: true
+
+- id: JAVA-DES-001
+  version: "1.0"
+  name: DES cipher use (deprecated)
+  severity: critical
+  confidence: confirmed
+  conditions:
+    language: java
+    patterns:
+      - type: method_call
+        class: Cipher
+        method: getInstance
+        algorithm_arg_prefix: "DES"
+    metadata:
+      deprecated: true
+
+- id: JAVA-BC-001
+  version: "1.0"
+  name: BouncyCastle provider registration
+  severity: info
+  confidence: probable
+  conditions:
+    language: java
+    patterns:
+      - type: method_call
+        class: Security
+        method: addProvider
+        arg_type: BouncyCastleProvider
+
+- id: JAVA-KEYMATERIAL-001
+  version: "1.0"
+  name: Hardcoded key material indicator
+  severity: critical
+  confidence: probable
+  conditions:
+    language: java
+    patterns:
+      - type: string_literal
+        pattern_regex: "^(?:[A-Za-z0-9+/]{40,}={0,2})$"
+        context: variable_assignment
+    metadata:
+      note: High false-positive rate — requires human review.

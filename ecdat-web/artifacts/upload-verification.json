@@ -1,0 +1,17 @@
+[
+  {
+    "id": "e0cc2484-1e8f-42ee-8ec9-b53c779b64af",
+    "kind": "source",
+    "count": 1
+  },
+  {
+    "id": "7f44d522-c6d6-4001-942c-8aa40471c2a9",
+    "kind": "apk",
+    "count": 3
+  },
+  {
+    "id": "455fbf94-5653-4ed6-b1b3-c50c392d54fa",
+    "kind": "exe",
+    "count": 1
+  }
+]

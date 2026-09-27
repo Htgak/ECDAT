@@ -1,0 +1,108 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "ECDAT",
+          "version": "0.2.0",
+          "rules": [
+            {
+              "id": "ECDAT-CRYPTO",
+              "shortDescription": {
+                "text": "Cryptographic artifact discovery"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "ECDAT-CRYPTO",
+          "level": "warning",
+          "message": {
+            "text": "ECDH: Evaluate ML-KEM for key establishment, with a protocol-supported classical/PQC hybrid during transition. Benchmark ML-DSA against SLH-DSA for signature workloads; for key establishment compare supported ML-KEM parameter sets and hybrid handshake sizes. Evidence: String indicator."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "quantum-assessment.js"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "riskScore": 86,
+            "mosca": {
+              "applicable": true,
+              "verdict": "act_now",
+              "x_years": 20.0,
+              "y_years": 2.0,
+              "z_years": 10.0,
+              "margin_years": -12.0,
+              "basis": "User-selected planning assumptions, not a forecast of quantum arrival"
+            }
+          }
+        },
+        {
+          "ruleId": "ECDAT-CRYPTO",
+          "level": "warning",
+          "message": {
+            "text": "RSA: Confirm whether this primitive signs or establishes keys. Evaluate ML-DSA for signatures or ML-KEM for key establishment. Benchmark ML-DSA against SLH-DSA for signature workloads; for key establishment compare supported ML-KEM parameter sets and hybrid handshake sizes. Evidence: String indicator."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "quantum-assessment.js"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "riskScore": 86,
+            "mosca": {
+              "applicable": true,
+              "verdict": "act_now",
+              "x_years": 20.0,
+              "y_years": 2.0,
+              "z_years": 10.0,
+              "margin_years": -12.0,
+              "basis": "User-selected planning assumptions, not a forecast of quantum arrival"
+            }
+          }
+        },
+        {
+          "ruleId": "ECDAT-CRYPTO",
+          "level": "note",
+          "message": {
+            "text": "AES: Check configuration and key management. Detection alone does not establish security. Evidence: String indicator."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "quantum-assessment.js"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "riskScore": 54,
+            "mosca": {
+              "applicable": false,
+              "verdict": "not_applicable",
+              "x_years": 20.0,
+              "y_years": 2.0,
+              "z_years": 10.0,
+              "margin_years": -12.0,
+              "basis": "User-selected planning assumptions, not a forecast of quantum arrival"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

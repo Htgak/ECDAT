@@ -1,0 +1,179 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "serialNumber": "urn:uuid:32972071-6fa3-4eae-aa9f-f2c0017e0f65",
+  "metadata": {
+    "timestamp": "2026-09-26T14:31:11.940099+00:00",
+    "component": {
+      "type": "application",
+      "name": "quantum-assessment.js"
+    },
+    "properties": [
+      {
+        "name": "ecdat:input-sha256",
+        "value": "f07e7706a526aa4570b8cc811f7f3235b89f9f399b6b032a79ab448400aec4ee"
+      },
+      {
+        "name": "ecdat:context",
+        "value": "{\"data_lifetime_years\": 20.0, \"migration_years\": 2.0, \"quantum_horizon_years\": 10.0, \"criticality\": \"critical\", \"exposure\": \"internal\", \"sensitivity\": \"confidential\", \"priority\": \"latency\"}"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "cryptographic-asset",
+      "bom-ref": "066d0ccdf5ea8a4c25ac07ab",
+      "name": "ECDH",
+      "properties": [
+        {
+          "name": "ecdat:asset_type",
+          "value": "algorithm"
+        },
+        {
+          "name": "ecdat:algorithm",
+          "value": "ECDH"
+        },
+        {
+          "name": "ecdat:location",
+          "value": "quantum-assessment.js"
+        },
+        {
+          "name": "ecdat:evidence",
+          "value": "String indicator"
+        },
+        {
+          "name": "ecdat:confidence",
+          "value": "indicator"
+        },
+        {
+          "name": "ecdat:context",
+          "value": "{\"data_lifetime_years\": 20.0, \"migration_years\": 2.0, \"quantum_horizon_years\": 10.0, \"criticality\": \"critical\", \"exposure\": \"internal\", \"sensitivity\": \"confidential\", \"priority\": \"latency\"}"
+        },
+        {
+          "name": "ecdat:mosca",
+          "value": "{\"applicable\": true, \"verdict\": \"act_now\", \"x_years\": 20.0, \"y_years\": 2.0, \"z_years\": 10.0, \"margin_years\": -12.0, \"basis\": \"User-selected planning assumptions, not a forecast of quantum arrival\"}"
+        },
+        {
+          "name": "ecdat:risk_score",
+          "value": "86"
+        },
+        {
+          "name": "ecdat:recommendation",
+          "value": "Evaluate ML-KEM for key establishment, with a protocol-supported classical/PQC hybrid during transition. Benchmark ML-DSA against SLH-DSA for signature workloads; for key establishment compare supported ML-KEM parameter sets and hybrid handshake sizes."
+        },
+        {
+          "name": "ecdat:tradeoffs",
+          "value": "Measure handshake size and p95 latency on the target platform; PQC keys and signatures can increase network traffic."
+        }
+      ],
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "bom-ref": "581b61b512cf29e18101ef8f",
+      "name": "RSA",
+      "properties": [
+        {
+          "name": "ecdat:asset_type",
+          "value": "algorithm"
+        },
+        {
+          "name": "ecdat:algorithm",
+          "value": "RSA"
+        },
+        {
+          "name": "ecdat:location",
+          "value": "quantum-assessment.js"
+        },
+        {
+          "name": "ecdat:evidence",
+          "value": "String indicator"
+        },
+        {
+          "name": "ecdat:confidence",
+          "value": "indicator"
+        },
+        {
+          "name": "ecdat:context",
+          "value": "{\"data_lifetime_years\": 20.0, \"migration_years\": 2.0, \"quantum_horizon_years\": 10.0, \"criticality\": \"critical\", \"exposure\": \"internal\", \"sensitivity\": \"confidential\", \"priority\": \"latency\"}"
+        },
+        {
+          "name": "ecdat:mosca",
+          "value": "{\"applicable\": true, \"verdict\": \"act_now\", \"x_years\": 20.0, \"y_years\": 2.0, \"z_years\": 10.0, \"margin_years\": -12.0, \"basis\": \"User-selected planning assumptions, not a forecast of quantum arrival\"}"
+        },
+        {
+          "name": "ecdat:risk_score",
+          "value": "86"
+        },
+        {
+          "name": "ecdat:recommendation",
+          "value": "Confirm whether this primitive signs or establishes keys. Evaluate ML-DSA for signatures or ML-KEM for key establishment. Benchmark ML-DSA against SLH-DSA for signature workloads; for key establishment compare supported ML-KEM parameter sets and hybrid handshake sizes."
+        },
+        {
+          "name": "ecdat:tradeoffs",
+          "value": "Measure handshake size and p95 latency on the target platform; PQC keys and signatures can increase network traffic."
+        }
+      ],
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      }
+    },
+    {
+      "type": "cryptographic-asset",
+      "bom-ref": "0e695e1484870830db2bfafc",
+      "name": "AES",
+      "properties": [
+        {
+          "name": "ecdat:asset_type",
+          "value": "algorithm"
+        },
+        {
+          "name": "ecdat:algorithm",
+          "value": "AES"
+        },
+        {
+          "name": "ecdat:location",
+          "value": "quantum-assessment.js"
+        },
+        {
+          "name": "ecdat:evidence",
+          "value": "String indicator"
+        },
+        {
+          "name": "ecdat:confidence",
+          "value": "indicator"
+        },
+        {
+          "name": "ecdat:context",
+          "value": "{\"data_lifetime_years\": 20.0, \"migration_years\": 2.0, \"quantum_horizon_years\": 10.0, \"criticality\": \"critical\", \"exposure\": \"internal\", \"sensitivity\": \"confidential\", \"priority\": \"latency\"}"
+        },
+        {
+          "name": "ecdat:mosca",
+          "value": "{\"applicable\": false, \"verdict\": \"not_applicable\", \"x_years\": 20.0, \"y_years\": 2.0, \"z_years\": 10.0, \"margin_years\": -12.0, \"basis\": \"User-selected planning assumptions, not a forecast of quantum arrival\"}"
+        },
+        {
+          "name": "ecdat:risk_score",
+          "value": "54"
+        },
+        {
+          "name": "ecdat:recommendation",
+          "value": "Check configuration and key management. Detection alone does not establish security."
+        },
+        {
+          "name": "ecdat:tradeoffs",
+          "value": "Measure handshake size and p95 latency on the target platform; PQC keys and signatures can increase network traffic."
+        },
+        {
+          "name": "ecdat:mode",
+          "value": "GCM"
+        }
+      ],
+      "cryptoProperties": {
+        "assetType": "algorithm"
+      }
+    }
+  ]
+}

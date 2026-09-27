@@ -1,0 +1,32 @@
+# Local credentials and scan evidence
+.env
+.env.*
+!.env.example
+**/evidence_store/
+**/auth.sqlite3*
+# Generated dependencies and build outputs
+**/.venv/
+**/node_modules/
+**/__pycache__/
+**/.pytest_cache/
+**/dist/
+
+# Test outputs, caches and local diagnostics
+**/*.py[cod]
+**/.mypy_cache/
+**/.ruff_cache/
+**/.coverage*
+**/htmlcov/
+**/coverage/
+**/test-results/
+**/playwright-report/
+**/*.tsbuildinfo
+**/*.log
+ecdat-web/artifacts/*.png
+ecdat-web/artifacts/*.zip
+# Local scan reports may contain sensitive source evidence
+/scan-report.json
+
+# IDE and tooling
+.vscode/
+.claude/

@@ -1,0 +1,173 @@
+{
+  "id": "32972071-6fa3-4eae-aa9f-f2c0017e0f65",
+  "filename": "quantum-assessment.js",
+  "kind": "source",
+  "context": {
+    "data_lifetime_years": 20.0,
+    "migration_years": 2.0,
+    "quantum_horizon_years": 10.0,
+    "criticality": "critical",
+    "exposure": "internal",
+    "sensitivity": "confidential",
+    "priority": "latency"
+  },
+  "size": 50,
+  "sha256": "f07e7706a526aa4570b8cc811f7f3235b89f9f399b6b032a79ab448400aec4ee",
+  "status": "completed",
+  "created_at": "2026-09-26T14:31:11.825986+00:00",
+  "completed_at": "2026-09-26T14:31:11.940099+00:00",
+  "finding_count": 3,
+  "review_count": 2,
+  "findings": [
+    {
+      "algorithm": "ECDH",
+      "location": "quantum-assessment.js",
+      "line": null,
+      "evidence": "String indicator",
+      "priority": "review",
+      "recommendation": "Evaluate ML-KEM for key establishment, with a protocol-supported classical/PQC hybrid during transition. Benchmark ML-DSA against SLH-DSA for signature workloads; for key establishment compare supported ML-KEM parameter sets and hybrid handshake sizes.",
+      "mode": null,
+      "asset_type": "algorithm",
+      "confidence": "indicator",
+      "id": "066d0ccdf5ea8a4c25ac07ab",
+      "context": {
+        "data_lifetime_years": 20.0,
+        "migration_years": 2.0,
+        "quantum_horizon_years": 10.0,
+        "criticality": "critical",
+        "exposure": "internal",
+        "sensitivity": "confidential",
+        "priority": "latency"
+      },
+      "quantum_status": "vulnerable",
+      "sensitive_data_risk": "Potential harvest-now-decrypt-later exposure: confirm this primitive protects confidential data in transit or at rest.",
+      "mosca": {
+        "applicable": true,
+        "verdict": "act_now",
+        "x_years": 20.0,
+        "y_years": 2.0,
+        "z_years": 10.0,
+        "margin_years": -12.0,
+        "basis": "User-selected planning assumptions, not a forecast of quantum arrival"
+      },
+      "risk_score": 86,
+      "alternatives": [
+        "ML-KEM",
+        "Protocol-supported hybrid"
+      ],
+      "migration_effort": "medium",
+      "tradeoffs": "Measure handshake size and p95 latency on the target platform; PQC keys and signatures can increase network traffic.",
+      "references": [
+        "https://csrc.nist.gov/pubs/fips/203/final",
+        "https://csrc.nist.gov/pubs/fips/204/final",
+        "https://csrc.nist.gov/pubs/fips/205/final"
+      ]
+    },
+    {
+      "algorithm": "RSA",
+      "location": "quantum-assessment.js",
+      "line": null,
+      "evidence": "String indicator",
+      "priority": "review",
+      "recommendation": "Confirm whether this primitive signs or establishes keys. Evaluate ML-DSA for signatures or ML-KEM for key establishment. Benchmark ML-DSA against SLH-DSA for signature workloads; for key establishment compare supported ML-KEM parameter sets and hybrid handshake sizes.",
+      "mode": null,
+      "asset_type": "algorithm",
+      "confidence": "indicator",
+      "id": "581b61b512cf29e18101ef8f",
+      "context": {
+        "data_lifetime_years": 20.0,
+        "migration_years": 2.0,
+        "quantum_horizon_years": 10.0,
+        "criticality": "critical",
+        "exposure": "internal",
+        "sensitivity": "confidential",
+        "priority": "latency"
+      },
+      "quantum_status": "vulnerable",
+      "sensitive_data_risk": "Potential harvest-now-decrypt-later exposure: confirm this primitive protects confidential data in transit or at rest.",
+      "mosca": {
+        "applicable": true,
+        "verdict": "act_now",
+        "x_years": 20.0,
+        "y_years": 2.0,
+        "z_years": 10.0,
+        "margin_years": -12.0,
+        "basis": "User-selected planning assumptions, not a forecast of quantum arrival"
+      },
+      "risk_score": 86,
+      "alternatives": [
+        "ML-KEM (key establishment)",
+        "ML-DSA (signatures)"
+      ],
+      "migration_effort": "medium",
+      "tradeoffs": "Measure handshake size and p95 latency on the target platform; PQC keys and signatures can increase network traffic.",
+      "references": [
+        "https://csrc.nist.gov/pubs/fips/203/final",
+        "https://csrc.nist.gov/pubs/fips/204/final",
+        "https://csrc.nist.gov/pubs/fips/205/final"
+      ]
+    },
+    {
+      "algorithm": "AES",
+      "location": "quantum-assessment.js",
+      "line": null,
+      "evidence": "String indicator",
+      "priority": "info",
+      "recommendation": "Check configuration and key management. Detection alone does not establish security.",
+      "mode": "GCM",
+      "asset_type": "algorithm",
+      "confidence": "indicator",
+      "id": "0e695e1484870830db2bfafc",
+      "context": {
+        "data_lifetime_years": 20.0,
+        "migration_years": 2.0,
+        "quantum_horizon_years": 10.0,
+        "criticality": "critical",
+        "exposure": "internal",
+        "sensitivity": "confidential",
+        "priority": "latency"
+      },
+      "quantum_status": "configuration_review",
+      "sensitive_data_risk": "Sensitive-data impact requires usage and configuration review.",
+      "mosca": {
+        "applicable": false,
+        "verdict": "not_applicable",
+        "x_years": 20.0,
+        "y_years": 2.0,
+        "z_years": 10.0,
+        "margin_years": -12.0,
+        "basis": "User-selected planning assumptions, not a forecast of quantum arrival"
+      },
+      "risk_score": 54,
+      "alternatives": [],
+      "migration_effort": "requires assessment",
+      "tradeoffs": "Measure handshake size and p95 latency on the target platform; PQC keys and signatures can increase network traffic.",
+      "references": []
+    }
+  ],
+  "limitations": [
+    "Metadata parsing is limited to the first 1 MiB per file. Versions, modes and key sizes remain unknown unless observed. Business context is supplied for the application and inherited by its findings.",
+    "Python and Java use source analysis; other supported languages use string indicators. This scan does not prove the code is secure."
+  ],
+  "error": null,
+  "assessment": {
+    "asset_types": {
+      "algorithm": 3
+    },
+    "quantum_vulnerable": 2,
+    "act_now": 2,
+    "legacy": 0,
+    "context": {
+      "data_lifetime_years": 20.0,
+      "migration_years": 2.0,
+      "quantum_horizon_years": 10.0,
+      "criticality": "critical",
+      "exposure": "internal",
+      "sensitivity": "confidential",
+      "priority": "latency"
+    }
+  },
+  "assessment_version": 1,
+  "inspected_files": 1,
+  "skipped_files": 0
+}

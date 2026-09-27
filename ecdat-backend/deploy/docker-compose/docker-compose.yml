@@ -1,0 +1,176 @@
+version: "3.9"
+
+# ======================================================================= #
+# ECDAT — Docker Compose stack (MVP / development)                         #
+#                                                                           #
+# Default services: api, worker, postgres, opa, valkey                     #
+# Optional profiles:                                                        #
+#   --profile auth        → Keycloak                                       #
+#   --profile monitoring  → Prometheus + Grafana + Loki                    #
+#   --profile secrets     → OpenBao                                        #
+# ======================================================================= #
+
+x-common-env: &common-env
+  DATABASE_URL: postgresql+asyncpg://ecdat:ecdat@postgres:5432/ecdat
+  VALKEY_URL: redis://valkey:6379/0
+  OPA_URL: http://opa:8181
+  EVIDENCE_STORE_PATH: /evidence_store
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  ENVIRONMENT: ${ENVIRONMENT:-development}
+  SECRET_KEY: ${SECRET_KEY:-change_me_in_development_only}
+
+services:
+  # ------------------------------------------------------------------ #
+  # API                                                                  #
+  # ------------------------------------------------------------------ #
+  ecdat-api:
+    build:
+      context: ..
+      dockerfile: deploy/docker-compose/Dockerfile
+    image: ecdat-backend:dev
+    container_name: ecdat-api
+    command: uvicorn ecdat.apps.api.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../:/app
+      - evidence_store:/evidence_store
+    environment:
+      <<: *common-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+      opa:
+        condition: service_started
+    restart: unless-stopped
+
+  # ------------------------------------------------------------------ #
+  # Worker                                                               #
+  # ------------------------------------------------------------------ #
+  ecdat-worker:
+    image: ecdat-backend:dev
+    container_name: ecdat-worker
+    command: python -m ecdat.apps.worker.main
+    volumes:
+      - ../:/app
+      - evidence_store:/evidence_store
+    environment:
+      <<: *common-env
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-4}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      valkey:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ------------------------------------------------------------------ #
+  # PostgreSQL                                                           #
+  # ------------------------------------------------------------------ #
+  postgres:
+    image: postgres:16-alpine
+    container_name: ecdat-postgres
+    environment:
+      POSTGRES_DB: ecdat
+      POSTGRES_USER: ecdat
+      POSTGRES_PASSWORD: ecdat
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ecdat -d ecdat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ------------------------------------------------------------------ #
+  # OPA (Open Policy Agent)                                             #
+  # ------------------------------------------------------------------ #
+  opa:
+    image: openpolicyagent/opa:latest
+    container_name: ecdat-opa
+    command: run --server --addr=0.0.0.0:8181 /policies
+    ports:
+      - "8181:8181"
+    volumes:
+      - ../policies:/policies:ro
+    restart: unless-stopped
+
+  # ------------------------------------------------------------------ #
+  # Valkey (Redis-compatible queue/cache)                               #
+  # ------------------------------------------------------------------ #
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: ecdat-valkey
+    ports:
+      - "6379:6379"
+    volumes:
+      - valkey_data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ------------------------------------------------------------------ #
+  # Keycloak (optional — auth profile)                                  #
+  # ------------------------------------------------------------------ #
+  keycloak:
+    profiles: [auth]
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: ecdat-keycloak
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: ecdat
+      KC_DB_PASSWORD: ecdat
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ------------------------------------------------------------------ #
+  # Prometheus (optional — monitoring profile)                          #
+  # ------------------------------------------------------------------ #
+  prometheus:
+    profiles: [monitoring]
+    image: prom/prometheus:latest
+    container_name: ecdat-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+
+  # ------------------------------------------------------------------ #
+  # Grafana (optional — monitoring profile)                             #
+  # ------------------------------------------------------------------ #
+  grafana:
+    profiles: [monitoring]
+    image: grafana/grafana:latest
+    container_name: ecdat-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on: [prometheus]
+
+
+volumes:
+  postgres_data:
+  valkey_data:
+  evidence_store:
+  prometheus_data:
+  grafana_data:
