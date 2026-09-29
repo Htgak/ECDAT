@@ -1,0 +1,40 @@
+# Netlify Configuration File (Netlify requires .toml format, not .yml)
+# Place at the root of your repository
+
+[build]
+  base = "ecdat-web"
+  publish = "dist"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# -----------------------------------------------------------------------------
+# Proxy API and health requests to your Render backend
+# IMPORTANT: Replace https://ecdat-backend.onrender.com with your actual Render URL
+# -----------------------------------------------------------------------------
+[[redirects]]
+  from = "/api/*"
+  to = "https://ecdat-backend.onrender.com/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/health"
+  to = "https://ecdat-backend.onrender.com/health"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/ready"
+  to = "https://ecdat-backend.onrender.com/ready"
+  status = 200
+  force = true
+
+# -----------------------------------------------------------------------------
+# SPA routing fallback: send all other paths to index.html
+# -----------------------------------------------------------------------------
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
