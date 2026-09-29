@@ -167,7 +167,7 @@ class TestJadxWithMockedSubprocess:
         mock_proc.stdout = b''
 
         with patch('ecdat.collectors.binary.decompiler.JADX_INFO', self._make_jadx_info()), \
-             patch('subprocess.run', return_value=mock_proc):
+             patch('ecdat.collectors.binary.decompiler.run_tool', return_value=mock_proc):
             result = run_jadx(fake_apk, tmp_path)
 
         algos = {f['algorithm'] for f in result.findings}
@@ -180,7 +180,7 @@ class TestJadxWithMockedSubprocess:
         fake_apk.write_bytes(b'\x00' * 100)
 
         with patch('ecdat.collectors.binary.decompiler.JADX_INFO', self._make_jadx_info()), \
-             patch('subprocess.run', side_effect=subprocess.TimeoutExpired('jadx', JADX_TIMEOUT_SECONDS)):
+             patch('ecdat.collectors.binary.decompiler.run_tool', side_effect=subprocess.TimeoutExpired('jadx', JADX_TIMEOUT_SECONDS)):
             result = run_jadx(fake_apk, tmp_path)
 
         assert any('timed out' in lim for lim in result.limitations)
@@ -195,7 +195,7 @@ class TestJadxWithMockedSubprocess:
         mock_proc.stdout = b''
 
         with patch('ecdat.collectors.binary.decompiler.JADX_INFO', self._make_jadx_info()), \
-             patch('subprocess.run', return_value=mock_proc):
+             patch('ecdat.collectors.binary.decompiler.run_tool', return_value=mock_proc):
             result = run_jadx(fake_apk, tmp_path)
 
         assert any('no Java source' in lim for lim in result.limitations)
@@ -210,7 +210,7 @@ class TestJadxWithMockedSubprocess:
         mock_proc.stdout = b''
 
         with patch('ecdat.collectors.binary.decompiler.JADX_INFO', self._make_jadx_info()), \
-             patch('subprocess.run', return_value=mock_proc):
+             patch('ecdat.collectors.binary.decompiler.run_tool', return_value=mock_proc):
             result = run_jadx(fake_apk, tmp_path)
 
         assert any('exited with code 2' in lim for lim in result.limitations)
@@ -231,7 +231,7 @@ class TestJadxWithMockedSubprocess:
         mock_proc.stdout = b''
 
         with patch('ecdat.collectors.binary.decompiler.JADX_INFO', self._make_jadx_info()), \
-             patch('subprocess.run', return_value=mock_proc):
+             patch('ecdat.collectors.binary.decompiler.run_tool', return_value=mock_proc):
             result = run_jadx(fake_apk, tmp_path)
 
         assert result.decompiled_files == MAX_DECOMPILE_FILES
@@ -275,7 +275,7 @@ class TestGhidraWithMockedSubprocess:
         mock_proc.stderr = b''
 
         with patch('ecdat.collectors.binary.decompiler.GHIDRA_INFO', self._make_ghidra_info()), \
-             patch('subprocess.run', return_value=mock_proc):
+             patch('ecdat.collectors.binary.decompiler.run_tool', return_value=mock_proc):
             result = run_ghidra(fake_elf, tmp_path)
 
         algos = {f['algorithm'] for f in result.findings}
@@ -293,7 +293,7 @@ class TestGhidraWithMockedSubprocess:
         mock_proc.stderr = b''
 
         with patch('ecdat.collectors.binary.decompiler.GHIDRA_INFO', self._make_ghidra_info()), \
-             patch('subprocess.run', return_value=mock_proc):
+             patch('ecdat.collectors.binary.decompiler.run_tool', return_value=mock_proc):
             result = run_ghidra(fake_elf, tmp_path)
 
         algos = {f['algorithm'] for f in result.findings}
@@ -309,7 +309,7 @@ class TestGhidraWithMockedSubprocess:
         mock_proc.stderr = b''
 
         with patch('ecdat.collectors.binary.decompiler.GHIDRA_INFO', self._make_ghidra_info()), \
-             patch('subprocess.run', return_value=mock_proc):
+             patch('ecdat.collectors.binary.decompiler.run_tool', return_value=mock_proc):
             result = run_ghidra(fake_elf, tmp_path)
 
         assert any('no crypto-related' in lim for lim in result.limitations)
@@ -319,7 +319,7 @@ class TestGhidraWithMockedSubprocess:
         fake_elf.write_bytes(b'\x7fELF' + b'\x00' * 60)
 
         with patch('ecdat.collectors.binary.decompiler.GHIDRA_INFO', self._make_ghidra_info()), \
-             patch('subprocess.run', side_effect=subprocess.TimeoutExpired('analyzeHeadless', GHIDRA_TIMEOUT_SECONDS)):
+             patch('ecdat.collectors.binary.decompiler.run_tool', side_effect=subprocess.TimeoutExpired('analyzeHeadless', GHIDRA_TIMEOUT_SECONDS)):
             result = run_ghidra(fake_elf, tmp_path)
 
         assert any('timed out' in lim for lim in result.limitations)
@@ -383,7 +383,7 @@ class TestDecompileAndScanDispatch:
         f.write_bytes(b'\x00' * 10)
 
         result = decompile_and_scan(f, 'source', tmp_path)
-        assert result.tool == 'unavailable'
+        assert result.tool == 'not_applicable'
         assert result.findings == []
 
 

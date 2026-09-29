@@ -1,0 +1,156 @@
+{
+  "repository": "https://github.com/pallets/itsdangerous",
+  "commit": "672971d66a2ef9f85151e53283113f33d642dabd",
+  "input_sha256": "7f5bed560ce35e6736a7678aa92baa9572f9c34fc8b672e879b9be329668d46a",
+  "coverage": {
+    "status": "PARTIAL",
+    "analyzed": 19,
+    "skipped": 31,
+    "opaque_binaries": 0,
+    "packed_encrypted": null,
+    "unsupported": 31,
+    "meaning": "Zero findings does not mean no cryptography exists. Runtime use is not confirmed."
+  },
+  "findings": [
+    {
+      "algorithm": "SHA-1",
+      "algorithm_raw": "SHA-1",
+      "location": "src/itsdangerous/signer.py",
+      "line": 45,
+      "evidence": "Source observation",
+      "scanner": "python-source",
+      "scanner_version": "1.0.0",
+      "rule_id": "PY-SHA1-001",
+      "rule_version": "1.0",
+      "priority": "review",
+      "recommendation": "Review usage: collision-sensitive integrity/signatures require migration; a non-security checksum is not the same risk. HMAC requires a separate policy assessment. Replace security-sensitive hashing with SHA-256 or stronger; use a password KDF for passwords.",
+      "mode": null,
+      "key_size": null,
+      "curve": null,
+      "provider": null,
+      "operation": "digest",
+      "padding": null,
+      "family": "hash",
+      "standard_status": "not_applicable",
+      "normalization_version": "2.0.0",
+      "hash_algorithm": null,
+      "asset_type": "algorithm",
+      "confidence": "observed",
+      "id": "59d7559e6e30e20fe99f1e8e",
+      "context": {},
+      "quantum_status": "not_assessed",
+      "sensitive_data_risk": "Data sensitivity has not been supplied. Confirm the protected data and operation to assess confidentiality or authenticity impact.",
+      "quantum_transition_status": "not_assessed",
+      "classical_status": "REVIEW REQUIRED",
+      "policy_status": "NOT ASSESSED: organization-specific policy not supplied",
+      "runtime_use": "NOT CONFIRMED",
+      "limitations": [
+        "Static evidence does not establish runtime use or security."
+      ],
+      "mosca": {
+        "applicable": false,
+        "verdict": "not_assessed",
+        "x_years": null,
+        "y_years": null,
+        "z_years": null,
+        "margin_years": null,
+        "basis": "Provide required protection lifetime, migration duration and an organization-selected quantum threat scenario to calculate Mosca.",
+        "formula": "Margin = Z - (X + Y); X = required protection lifetime; Y = migration duration"
+      },
+      "risk_score": null,
+      "alternatives": [
+        "SHA-256 / SHA-384"
+      ],
+      "migration_effort": "medium",
+      "tradeoffs": "Benchmark latency, bandwidth, memory and operating costs before selecting parameters; estimates are not measurements.",
+      "references": [],
+      "recommendation_explanation": {
+        "recommendation": "Review usage: collision-sensitive integrity/signatures require migration; a non-security checksum is not the same risk. HMAC requires a separate policy assessment. Replace security-sensitive hashing with SHA-256 or stronger; use a password KDF for passwords.",
+        "because": [
+          "SHA-1 observed",
+          "operation = digest",
+          "quantum status = not_assessed"
+        ],
+        "standard_basis": []
+      },
+      "context_source": "not_provided",
+      "planning_priority": {
+        "score": null,
+        "model": "ECDAT Planning Priority v1",
+        "breakdown": {},
+        "meaning": "Planning Priority Score, not probability of attack and not a security certification."
+      },
+      "migration_priority": "Unassessed"
+    },
+    {
+      "algorithm": "SHA-256",
+      "algorithm_raw": "sha256",
+      "location": "uv.lock",
+      "line": null,
+      "evidence": "String indicator",
+      "priority": "info",
+      "recommendation": "Check configuration and key management. Detection alone does not establish security.",
+      "mode": null,
+      "family": "hash",
+      "standard_status": "not_applicable",
+      "normalization_version": "2.0.0",
+      "padding": null,
+      "operation": null,
+      "hash_algorithm": null,
+      "asset_type": "algorithm",
+      "confidence": "indicator",
+      "id": "2b3d494477c7da9c0139256a",
+      "context": {},
+      "quantum_status": "quantum_resistant_under_current_guidance",
+      "sensitive_data_risk": "Data sensitivity has not been supplied. Confirm the protected data and operation to assess confidentiality or authenticity impact.",
+      "quantum_transition_status": "quantum_resistant_under_current_guidance",
+      "classical_status": "REVIEW REQUIRED",
+      "policy_status": "NOT ASSESSED: organization-specific policy not supplied",
+      "runtime_use": "NOT CONFIRMED",
+      "scanner": "bounded-static-indicators",
+      "scanner_version": "2.0.0",
+      "rule_id": "ECDAT-CRYPTO",
+      "rule_version": "2.0.0",
+      "limitations": [
+        "Static evidence does not establish runtime use or security."
+      ],
+      "mosca": {
+        "applicable": false,
+        "verdict": "not_assessed",
+        "x_years": null,
+        "y_years": null,
+        "z_years": null,
+        "margin_years": null,
+        "basis": "Provide required protection lifetime, migration duration and an organization-selected quantum threat scenario to calculate Mosca.",
+        "formula": "Margin = Z - (X + Y); X = required protection lifetime; Y = migration duration"
+      },
+      "risk_score": null,
+      "alternatives": [],
+      "migration_effort": "requires assessment",
+      "tradeoffs": "Benchmark latency, bandwidth, memory and operating costs before selecting parameters; estimates are not measurements.",
+      "references": [],
+      "recommendation_explanation": {
+        "recommendation": "Check configuration and key management. Detection alone does not establish security.",
+        "because": [
+          "SHA-256 observed",
+          "operation = unknown",
+          "quantum status = quantum_resistant_under_current_guidance"
+        ],
+        "standard_basis": []
+      },
+      "context_source": "not_provided",
+      "planning_priority": {
+        "score": null,
+        "model": "ECDAT Planning Priority v1",
+        "breakdown": {},
+        "meaning": "Planning Priority Score, not probability of attack and not a security certification."
+      },
+      "migration_priority": "Unassessed"
+    }
+  ],
+  "limitations": [
+    "Snapshot of one Git revision. Submodules and Git LFS objects are not fetched; repository code is never executed.",
+    "Python and Java use source analysis; other supported languages use string indicators. This scan does not prove the code is secure.",
+    "Metadata parsing is limited to the first 1 MiB per file. Versions, modes and key sizes remain unknown unless observed. Business context is supplied for the application and inherited by its findings."
+  ]
+}

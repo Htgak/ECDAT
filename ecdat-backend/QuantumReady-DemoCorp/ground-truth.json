@@ -1,0 +1,72 @@
+{
+  "cases": [
+    {
+      "file": "payment-service/PaymentService.java",
+      "expected": [
+        "RSA"
+      ]
+    },
+    {
+      "file": "identity-service/Identity.py",
+      "expected": [
+        "ECDH"
+      ]
+    },
+    {
+      "file": "legacy-ingest/Legacy.java",
+      "expected": [
+        "3DES"
+      ]
+    },
+    {
+      "file": "legacy-ingest/checksum.py",
+      "expected": [
+        "SHA-1"
+      ]
+    },
+    {
+      "file": "secure-storage/Storage.py",
+      "expected": [
+        "AES"
+      ]
+    },
+    {
+      "file": "pqc-gateway/Kem.java",
+      "expected": [
+        "ML-KEM"
+      ]
+    },
+    {
+      "file": "pqc-gateway/Signature.java",
+      "expected": [
+        "ML-DSA"
+      ]
+    },
+    {
+      "file": "certificates/rsa.pem",
+      "expected": [
+        "RSA"
+      ]
+    },
+    {
+      "file": "certificates/ec.pem",
+      "expected": [
+        "EC"
+      ]
+    },
+    {
+      "file": "binary/crypto.so",
+      "expected": [
+        "RSA"
+      ]
+    },
+    {
+      "file": "container/requirements.txt",
+      "expected": [
+        "Unknown"
+      ],
+      "asset_type": "library",
+      "meaning": "Dependency capability, not runtime use"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 """Versioned local review rules; these are not compliance certifications."""
 from datetime import datetime, timezone
 
-POLICY_VERSION = '1.0.0'
+POLICY_VERSION = '2.0.0'
 
 
 def evaluate(findings: list[dict], scan_id: str) -> list[dict]:
@@ -11,7 +11,9 @@ def evaluate(findings: list[dict], scan_id: str) -> list[dict]:
         algorithm = finding['algorithm'].upper().replace('_', '-')
         checks = []
         if algorithm in {'MD5', 'SHA1', 'SHA-1', 'DES', '3DES', 'DESEDE', 'RC4', 'ARC4'}:
-            checks.append(('CRYPTO-LEGACY-001', 'Review legacy cryptography', 'HIGH', 'algorithm', algorithm, 'fail', 'Review security-sensitive use of this legacy primitive.'))
+            checks.append(('CRYPTO-LEGACY-001', 'Review legacy cryptography', 'HIGH', 'algorithm', algorithm, 'warn' if algorithm in {'MD5', 'SHA1', 'SHA-1'} else 'fail', 'Review security-sensitive use of this legacy primitive.'))
+        if algorithm == 'AES' and finding.get('mode') == 'ECB':
+            checks.append(('CRYPTO-MODE-001', 'Review ECB mode', 'HIGH', 'mode', 'ECB', 'fail', 'ECB exposes repeated plaintext patterns; review authenticated encryption.'))
         if algorithm == 'RSA':
             size = finding.get('key_size')
             verdict = 'unknown' if size is None else 'fail' if size < 2048 else 'pass'

@@ -31,7 +31,7 @@ class TestAdvisoryEngine:
         advice = self.engine.recommend("ECDSA", use_case="signing")
         assert advice is not None
         assert advice.primary_recommendation.name == "ML-DSA-65"
-        assert advice.cnsa2_compliant is True
+        assert advice.cnsa2_compliant is False
 
     def test_broken_hash_recommendations(self) -> None:
         sha1_advice = self.engine.recommend("SHA-1", use_case="hashing")

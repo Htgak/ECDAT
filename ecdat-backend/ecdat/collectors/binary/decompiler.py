@@ -25,6 +25,7 @@ import os
 import re
 import shutil
 import subprocess
+from ecdat.collectors.binary.process import run_tool
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -55,7 +56,8 @@ _CRYPTO_PATTERNS: list[tuple[str, re.Pattern[bytes]]] = [
     ("SHA-256",  re.compile(rb"(?i)\bSHA[-_]?256\b")),
     ("ChaCha20", re.compile(rb"(?i)\bChaCha20\b")),
     ("RC4",      re.compile(rb"(?i)\b(?:RC4|ARC4)\b")),
-    ("ML-KEM",   re.compile(rb"(?i)\b(?:ML[-_]?KEM|Kyber)\b")),
+    ("ML-KEM",   re.compile(rb"(?i)\bML[-_]?KEM\b")),
+    ("Kyber", re.compile(rb"(?i)\bKyber\b")),
     ("ML-DSA",   re.compile(rb"(?i)\bML[-_]?DSA\b")),
     ("SLH-DSA",  re.compile(rb"(?i)\bSLH[-_]?DSA\b")),
     ("Ed25519",  re.compile(rb"(?i)\bEd25519\b")),
@@ -78,7 +80,8 @@ _SYMBOL_ALGO_SUBSTRINGS: list[tuple[str, list[str]]] = [
     ("DES",      ["_des_", "DES_"]),
     ("RC4",      ["rc4", "arc4", "RC4", "ARC4"]),
     ("ChaCha20", ["chacha20", "ChaCha20"]),
-    ("ML-KEM",   ["ml_kem", "ml-kem", "mlkem", "kyber", "ML_KEM", "Kyber"]),
+    ("ML-KEM",   ["ml_kem", "ml-kem", "mlkem", "ML_KEM"]),
+    ("Kyber", ["kyber", "Kyber"]),
     ("ML-DSA",   ["ml_dsa", "ml-dsa", "mldsa", "ML_DSA"]),
     ("SLH-DSA",  ["slh_dsa", "slh-dsa", "slhdsa", "SLH_DSA"]),
     ("Ed25519",  ["ed25519", "Ed25519"]),
@@ -91,8 +94,10 @@ def _match_symbol_name(sym_name: str) -> list[str]:
     """Return algorithm labels matched by substring in a binary symbol name."""
     matched: list[str] = []
     for algorithm, substrings in _SYMBOL_ALGO_SUBSTRINGS:
+        if algorithm == 'DSA' and re.search(r'(?i)(?:ec|ml[-_]?|slh[-_]?)dsa', sym_name):
+            continue
         for sub in substrings:
-            if sub in sym_name:
+            if re.search(r'(?i)(?<![a-z0-9])' + re.escape(sub.strip('_')) + r'(?![a-z])', sym_name):
                 matched.append(algorithm)
                 break
     return matched
@@ -214,7 +219,7 @@ def _scan_source_bytes(
                 evidence=f"Decompiled source ({tool})",
                 priority=_priority(algorithm),
                 recommendation=_recommendation(algorithm),
-                snippet=snippet[:200],
+                snippet="[source snippet withheld]",
             ))
     return findings
 
@@ -232,7 +237,7 @@ def run_jadx(input_path: Path, work_dir: Path) -> DecompileResult:
         result.limitations.append(
             "JADX is not installed. APK/DEX/JAR decompilation is unavailable; "
             "string indicators were used instead. "
-            "Install JADX to enable full decompilation."
+            "Optional JADX assistance provides static indicators; runtime use remains unconfirmed."
         )
         return result
 
@@ -244,7 +249,7 @@ def run_jadx(input_path: Path, work_dir: Path) -> DecompileResult:
         return result
 
     out_dir = work_dir / "jadx-output"
-    out_dir.mkdir(exist_ok=True)
+    out_dir.mkdir(exist_ok=True, mode=0o700)
 
     cmd = [
         JADX_INFO.path,
@@ -255,9 +260,8 @@ def run_jadx(input_path: Path, work_dir: Path) -> DecompileResult:
     ]
     logger.info("Running JADX: %s", " ".join(cmd))
     try:
-        proc = subprocess.run(
+        proc = run_tool(
             cmd,
-            capture_output=True,
             timeout=JADX_TIMEOUT_SECONDS,
             cwd=str(work_dir),
         )
@@ -265,7 +269,7 @@ def run_jadx(input_path: Path, work_dir: Path) -> DecompileResult:
             stderr_snippet = proc.stderr[-500:].decode("utf-8", errors="replace")
             result.limitations.append(
                 f"JADX exited with code {proc.returncode}. "
-                f"Output may be partial. stderr: {stderr_snippet}"
+                "Output may be partial; tool output withheld to protect uploaded secrets."
             )
     except subprocess.TimeoutExpired:
         result.limitations.append(
@@ -286,7 +290,13 @@ def run_jadx(input_path: Path, work_dir: Path) -> DecompileResult:
 
     for java_file in java_files:
         try:
-            data = java_file.read_bytes()
+            if java_file.is_symlink():
+                result.limitations.append("Symlink in tool output skipped.")
+                continue
+            with java_file.open('rb') as stream:
+                data = stream.read(1024 * 1024)
+            if java_file.stat().st_size > len(data):
+                result.limitations.append('Decompiled source exceeded 1 MiB per-file inspection limit.')
             result.decompiled_lines += data.count(b"\n")
             rel = str(java_file.relative_to(out_dir)).replace("\\", "/")
             result.findings.extend(
@@ -359,7 +369,7 @@ def run_ghidra(input_path: Path, work_dir: Path) -> DecompileResult:
         result.limitations.append(
             "Ghidra is not installed. Native binary symbol analysis is unavailable; "
             "string indicators were used instead. "
-            "Install Ghidra to enable deep symbol extraction."
+            "Optional Ghidra assistance provides static symbol inspection."
         )
         return result
 
@@ -371,13 +381,13 @@ def run_ghidra(input_path: Path, work_dir: Path) -> DecompileResult:
         return result
 
     script_dir = work_dir / "ghidra-scripts"
-    script_dir.mkdir(exist_ok=True)
+    script_dir.mkdir(exist_ok=True, mode=0o700)
     (script_dir / _GHIDRA_SCRIPT_NAME).write_text(
         _GHIDRA_SCRIPT_CONTENT, encoding="utf-8"
     )
 
     project_dir = work_dir / "ghidra-project"
-    project_dir.mkdir(exist_ok=True)
+    project_dir.mkdir(exist_ok=True, mode=0o700)
 
     cmd = [
         GHIDRA_INFO.path,
@@ -392,9 +402,8 @@ def run_ghidra(input_path: Path, work_dir: Path) -> DecompileResult:
     ]
     logger.info("Running Ghidra: %s", " ".join(cmd))
     try:
-        proc = subprocess.run(
+        proc = run_tool(
             cmd,
-            capture_output=True,
             timeout=GHIDRA_TIMEOUT_SECONDS,
             cwd=str(work_dir),
         )
@@ -412,7 +421,7 @@ def run_ghidra(input_path: Path, work_dir: Path) -> DecompileResult:
     if proc.returncode != 0:
         stderr_snippet = proc.stderr[-300:].decode("utf-8", errors="replace")
         result.limitations.append(
-            f"Ghidra exited with code {proc.returncode}. stderr: {stderr_snippet}"
+            f"Ghidra exited with code {proc.returncode}; analysis incomplete. Tool output withheld."
         )
 
     output = proc.stdout.decode("utf-8", errors="replace")
@@ -461,7 +470,7 @@ def run_ghidra(input_path: Path, work_dir: Path) -> DecompileResult:
 # ---------------------------------------------------------------------------
 
 def decompile_and_scan(
-    input_path: Path, kind: str, work_dir: Path
+    input_path: Path, kind: str, work_dir: Path, original_name: str | None = None
 ) -> DecompileResult:
     """Select and run the appropriate decompiler for the given file type.
 
@@ -473,7 +482,9 @@ def decompile_and_scan(
     Returns:
         DecompileResult with findings, limitations, and tool provenance.
     """
-    suffix = input_path.suffix.lower()
+    suffix = Path(original_name or input_path.name).suffix.lower()
+    if kind in {'source', 'container'}:
+        return DecompileResult(tool='not_applicable', tool_version='')
 
     if kind == "apk" or suffix in {".apk", ".dex", ".aar"}:
         return run_jadx(input_path, work_dir)

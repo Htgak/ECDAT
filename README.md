@@ -128,7 +128,7 @@ For remote deployment, configure TLS, `SESSION_COOKIE_SECURE=true`, exact allowe
 ## Scan and Review Workflow
 
 1. Open **Discovery scans** (`/scans`), choose an input type, and select a file or supported public Git repository URL.
-2. Supply organizational context if known (data lifetime $X$, migration duration $Y$, quantum horizon scenario $Z$, criticality, sensitivity, exposure). Leave unknown fields blank; zero years is an explicit value, not an unknown value.
+2. Supply organizational context if known (required protection lifetime $X$, migration duration $Y$, quantum horizon scenario $Z$, criticality, sensitivity, exposure). Leave unknown fields blank; zero years is an explicit value, not an unknown value.
 3. Start the scan. The API returns a scan ID and performs bounded background work; the UI polls status until completion or failure.
 4. Read evidence, locations, configurations and limitations in the saved result.
 5. Review **Crypto inventory** (`/assets`), **Policy compliance** (`/policies`) and **PQC advisories** (`/advisories`).
@@ -152,26 +152,26 @@ Uploads are limited to **500 MiB** (multipart request budget 501 MiB). Archive e
 ## Assessment Model & Replacement Suggestions
 
 Context applies to the scan and is inherited by its findings:
-- **Mosca Planning Theorem ($X + Y > Z$)**:
-  - $X$: Required data protection lifetime (years)
+- **Mosca Planning Theorem ($X + Y \ge Z$)**:
+  - $X$: Required protection lifetime (years)
   - $Y$: System migration duration (years)
-  - $Z$: Quantum threat horizon (estimated arrival of cryptographically relevant quantum computer)
-  - Verdicts: `act_now` ($X + Y > Z$), `monitor` ($0 \le Z - X - Y \le 2$), `within_horizon` ($Z - X - Y > 2$), or `not_assessed` if inputs are missing.
+  - $Z$: Organization-selected quantum threat horizon; not a prediction of Q-Day
+  - Verdicts: `act_now` ($X + Y \ge Z$), `monitor` ($0 < Z - X - Y \le 2$), `within_horizon` ($Z - X - Y > 2$), or `not_assessed` if inputs are missing.
 - **Planning Score**: An explainable 0–100 heuristic based on temporal urgency (40%), business criticality (25%), data sensitivity (20%), and exposure (15%).
 - **PQC Migration Advisories**:
   - Distinguishes digital signatures from key establishment / KEMs.
   - Recommends NIST FIPS standards: **ML-KEM** (FIPS 203), **ML-DSA** (FIPS 204), **SLH-DSA** (FIPS 205), or supported classical/hybrid configurations.
-  - Suggests configuration upgrades for symmetric primitives (e.g. AES-256, SHA-384).
+  - Separates symmetric/hash configuration and organizational policy from public-key PQ migration. AES-128/192/256 do not receive an automatic PQ replacement requirement.
 
 ---
 
 ## Policy Definitions & Governance
 
-The active policy engine is the deterministic **ECDAT review baseline (v1.0.0)** implemented in `ecdat-backend/ecdat/core/discovery/policies.py`:
+The active policy engine is the deterministic **ECDAT review baseline (v2.0.0)** implemented in `ecdat-backend/ecdat/core/discovery/policies.py`:
 
 | Rule | Check | Outcome |
 |---|---|---|
-| `CRYPTO-LEGACY-001` | MD5, SHA-1, DES, 3DES/DESEDE, RC4/ARC4 | Fail for observed usage; warning for string-only match |
+| `CRYPTO-LEGACY-001` | MD5, SHA-1, DES, 3DES/DESEDE, RC4/ARC4 | Review for MD5/SHA-1 unless use context is established; fail for observed obsolete ciphers; warning for string indicators |
 | `CRYPTO-RSA-001` | RSA key length at least 2048 bits | Pass/fail when known; passing does not confer quantum resistance |
 | `PQC-MIGRATION-001` | Quantum-vulnerable public-key primitive | Warning to plan migration to ML-KEM / ML-DSA |
 | `CRYPTO-KEY-001` | Private-key marker or parsed private key | Warning to review whether key material belongs in artifact |
@@ -303,3 +303,20 @@ For local use, start both `setup.bat backend` and `setup.bat frontend`, then ope
 `.gitignore` excludes credentials, evidence, SQLite authentication state, dependencies, build outputs, caches, logs and generated browser screenshots. Keep test scripts and lockfiles under version control. Ignore rules do not remove files already tracked; review staged changes for sensitive evidence before committing.
 
 Administrator UI update: admins land on `/admin/users`, where Add user and the account list are shown. Admin frontend URLs redirect there; scan navigation and scan creation controls are reserved for normal-user workspaces. Backend account isolation remains unchanged. The header and login page provide a labeled Light theme / Dark theme toggle. Rebuild the Docker frontend after UI changes.
+
+
+## SIH26164 hardening and reproducible demo
+
+ECDAT is a deterministic, evidence-first cryptographic discovery and post-quantum migration planning platform. It scans supported software artefacts, produces a standardized cryptographic inventory/CBOM, separates observed evidence from uncertainty, combines technical findings with organization-supplied business context, and prioritizes PQC migration using transparent, reproducible rules.
+
+ECDAT gives organizations the visibility and prioritization needed to begin a defensible PQC migration. It does not prove that a system is secure.
+
+See [hardening verification and remaining limits](docs/FINAL-HARDENING.md) for measured results, offline demonstration commands, schema provenance, and operational limitations. The stable CycloneDX 1.6 export remains available alongside a schema-validated 1.7 export. Both formats and SARIF validate locally; no runtime schema download is required.
+
+The upload form accepts optional application/system name, owner/business unit, and description. `protection_lifetime_years` is the API/UI name for X; the old `data_lifetime_years` input is accepted for compatibility. X describes confidentiality or long-lived authenticity requirements; certificate expiry never supplies X.
+
+Planning Priority v1 returns a breakdown and only emits a numeric score when X, Y, Z, criticality, sensitivity, and exposure are supplied. It rounds the sum of: temporal contribution (40 for a legacy primitive or urgent public-key transition, 24 for other vulnerable public keys, 8 otherwise); criticality (6.25/12.5/18.75/25 for low/medium/high/critical); sensitivity (2/8/15/20 for public/internal/confidential/restricted); exposure (6 internal, 15 external). This is a planning heuristic, not attack probability or certification. A monitor margin is greater than zero and at most two years.
+
+From `ecdat-backend`, run `uv run python benchmarks/run_full_benchmark.py`. The committed corpus includes positive, negative, dynamic-selection, and provider-API controls. Metrics match canonical algorithms per case, collapsing repeated observations within a case; they do not measure exhaustive code coverage, operation accuracy, or runtime use.
+
+The production backend runs as UID 10001. Optional JADX/Ghidra downloads are disabled by default; enable them only with `INSTALL_DECOMPILERS=true`, `JADX_SHA256`, and `GHIDRA_SHA256` build arguments obtained from independently verified release archives. Missing/mismatched checksums fail the build. The default offline demonstration does not depend on these tools. The uv image is version/digest pinned and Python dependencies use `uv.lock`.

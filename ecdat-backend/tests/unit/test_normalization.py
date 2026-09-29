@@ -65,13 +65,13 @@ class TestNormalizeAlgorithm:
         assert result.is_pqc is False
 
     def test_pqc_ml_kem(self):
-        for raw in ["ML-KEM", "mlkem", "Kyber"]:
+        for raw in ["ML-KEM", "mlkem"]:
             result = normalize_algorithm(raw)
             assert result.canonical == "ML-KEM", f"Failed for: {raw}"
             assert result.is_pqc is True
 
     def test_pqc_ml_dsa(self):
-        for raw in ["ML-DSA", "Dilithium", "mldsa"]:
+        for raw in ["ML-DSA", "mldsa"]:
             result = normalize_algorithm(raw)
             assert result.canonical == "ML-DSA", f"Failed for: {raw}"
             assert result.is_pqc is True

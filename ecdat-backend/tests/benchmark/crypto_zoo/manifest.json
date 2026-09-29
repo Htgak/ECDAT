@@ -1,0 +1,435 @@
+{
+  "matching": "case + canonical algorithm; metadata/capability findings included",
+  "cases": [
+    {
+      "file": "python_rsa.py",
+      "category": "Python",
+      "expected": [
+        "RSA"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "python_ec.py",
+      "category": "Python",
+      "expected": [
+        "EC"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "python_ecdh.py",
+      "category": "Python",
+      "expected": [
+        "ECDH"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "python_ecdsa.py",
+      "category": "Python",
+      "expected": [
+        "ECDSA"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "python_gcm.py",
+      "category": "Python",
+      "expected": [
+        "AES"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "python_cbc.py",
+      "category": "Python",
+      "expected": [
+        "AES"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "python_pbkdf.py",
+      "category": "Python",
+      "expected": [
+        "PBKDF2"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "python_pem.py",
+      "category": "Python",
+      "expected": [
+        "Unknown"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "python_alias.py",
+      "category": "Python",
+      "expected": [
+        "AES"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "python_sha256.py",
+      "category": "Python",
+      "expected": [
+        "SHA-256"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "python_sha1.py",
+      "category": "Python",
+      "expected": [
+        "SHA-1"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "python_md5.py",
+      "category": "Python",
+      "expected": [
+        "MD5"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "python_sha512.py",
+      "category": "Python",
+      "expected": [
+        "SHA-512"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "python_sha3_256.py",
+      "category": "Python",
+      "expected": [
+        "SHA3-256"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "python_negative_comment.py",
+      "category": "Python",
+      "expected": [],
+      "kind": "source"
+    },
+    {
+      "file": "python_negative_labels.py",
+      "category": "Python",
+      "expected": [],
+      "kind": "source"
+    },
+    {
+      "file": "python_negative_lookalike.py",
+      "category": "Python",
+      "expected": [],
+      "kind": "source"
+    },
+    {
+      "file": "python_negative_plain.py",
+      "category": "Python",
+      "expected": [],
+      "kind": "source"
+    },
+    {
+      "file": "python_negative_custom.py",
+      "category": "Python",
+      "expected": [],
+      "kind": "source"
+    },
+    {
+      "file": "python_negative_nested.py",
+      "category": "Python",
+      "expected": [],
+      "kind": "source"
+    },
+    {
+      "file": "Java_rsa_sign.java",
+      "category": "Java",
+      "expected": [
+        "RSA"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_rsa_cipher.java",
+      "category": "Java",
+      "expected": [
+        "RSA"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_rsa_key.java",
+      "category": "Java",
+      "expected": [
+        "RSA"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_ecdh.java",
+      "category": "Java",
+      "expected": [
+        "ECDH"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_ecdsa.java",
+      "category": "Java",
+      "expected": [
+        "ECDSA"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_ec.java",
+      "category": "Java",
+      "expected": [
+        "EC"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_gcm.java",
+      "category": "Java",
+      "expected": [
+        "AES"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_ecb.java",
+      "category": "Java",
+      "expected": [
+        "AES"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_cbc.java",
+      "category": "Java",
+      "expected": [
+        "AES"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_sha256.java",
+      "category": "Java",
+      "expected": [
+        "SHA-256"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_sha1.java",
+      "category": "Java",
+      "expected": [
+        "SHA-1"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_desede.java",
+      "category": "Java",
+      "expected": [
+        "3DES"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_hmac.java",
+      "category": "Java",
+      "expected": [
+        "HMAC"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_pbkdf.java",
+      "category": "Java",
+      "expected": [
+        "PBKDF2"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_mlkem.java",
+      "category": "Java",
+      "expected": [
+        "ML-KEM"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_mldsa.java",
+      "category": "Java",
+      "expected": [
+        "ML-DSA"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_slhdsa.java",
+      "category": "Java",
+      "expected": [
+        "SLH-DSA"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_kyber.java",
+      "category": "Java",
+      "expected": [
+        "Kyber"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "Java_negative_comment.java",
+      "category": "Java",
+      "expected": [],
+      "kind": "source"
+    },
+    {
+      "file": "Java_negative_string.java",
+      "category": "Java",
+      "expected": [],
+      "kind": "source"
+    },
+    {
+      "file": "Java_negative_name.java",
+      "category": "Java",
+      "expected": [],
+      "kind": "source"
+    },
+    {
+      "file": "Java_negative_plain.java",
+      "category": "Java",
+      "expected": [],
+      "kind": "source"
+    },
+    {
+      "file": "certificate_rsa.pem",
+      "category": "Certificate",
+      "expected": [
+        "RSA"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "certificate_ec.pem",
+      "category": "Certificate",
+      "expected": [
+        "EC"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "certificate_expired.pem",
+      "category": "Certificate",
+      "expected": [
+        "RSA"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "encrypted_key.pem",
+      "category": "Certificate",
+      "expected": [
+        "Unknown"
+      ],
+      "kind": "source"
+    },
+    {
+      "file": "binary_rsa.so",
+      "category": "Binary indicator",
+      "expected": [
+        "RSA"
+      ],
+      "kind": "library"
+    },
+    {
+      "file": "binary_aes.so",
+      "category": "Binary indicator",
+      "expected": [
+        "AES"
+      ],
+      "kind": "library"
+    },
+    {
+      "file": "binary_sha.so",
+      "category": "Binary indicator",
+      "expected": [
+        "SHA-256"
+      ],
+      "kind": "library"
+    },
+    {
+      "file": "binary_pqc.so",
+      "category": "Binary indicator",
+      "expected": [
+        "ML-KEM",
+        "ML-DSA",
+        "SLH-DSA"
+      ],
+      "kind": "library"
+    },
+    {
+      "file": "binary_negative.so",
+      "category": "Binary indicator",
+      "expected": [],
+      "kind": "library"
+    },
+    {
+      "file": "binary_plain.so",
+      "category": "Binary indicator",
+      "expected": [],
+      "kind": "library"
+    },
+    {
+      "file": "python_dynamic.py",
+      "category": "Python",
+      "expected": [
+        "SHA-256"
+      ],
+      "kind": "source",
+      "note": "Dynamic/provider API coverage control; unresolved is a measured miss."
+    },
+    {
+      "file": "python_oqs_kem.py",
+      "category": "Python",
+      "expected": [
+        "ML-KEM"
+      ],
+      "kind": "source",
+      "note": "Dynamic/provider API coverage control; unresolved is a measured miss."
+    },
+    {
+      "file": "python_oqs_signature.py",
+      "category": "Python",
+      "expected": [
+        "ML-DSA"
+      ],
+      "kind": "source",
+      "note": "Dynamic/provider API coverage control; unresolved is a measured miss."
+    },
+    {
+      "file": "Java_dynamic.java",
+      "category": "Java",
+      "expected": [
+        "AES"
+      ],
+      "kind": "source",
+      "note": "Dynamic/provider API coverage control; unresolved is a measured miss."
+    }
+  ]
+}

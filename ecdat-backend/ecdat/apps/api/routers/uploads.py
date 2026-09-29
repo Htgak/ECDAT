@@ -27,6 +27,7 @@ from pydantic import BaseModel, Field, ValidationError
 from ecdat.core.discovery.assessment import RiskContext, enrich, write_standard_reports
 from ecdat.core.discovery.metadata import discover, METADATA_EXTENSIONS
 from ecdat.core.discovery.policies import evaluate as evaluate_policies, POLICY_VERSION
+from ecdat.core.normalization.algorithms import normalize_finding, NORMALIZATION_VERSION
 from ecdat.core.discovery.inputs import repository_snapshot, validate_repository, container_snapshot
 from ecdat.collectors.binary.decompiler import decompile_and_scan, tool_status as decompiler_tool_status
 from starlette.concurrency import run_in_threadpool
@@ -67,7 +68,8 @@ PATTERNS = [
     ('AES', rb'(?<![a-z0-9])aes(?![a-z0-9])'),
     ('SHA-256', rb'(?<![a-z0-9])sha[-_]?256(?![a-z0-9])'),
     ('ChaCha20', rb'(?<![a-z0-9])chacha20(?![a-z0-9])'),
-    ('ML-KEM', rb'(?<![a-z0-9])(?:ml[-_]?kem|kyber)(?![a-z0-9])'),
+    ('ML-KEM', rb'(?<![a-z0-9])ml[-_]?kem(?![a-z0-9])'),
+    ('Kyber', rb'(?<![a-z0-9])kyber(?![a-z0-9])'),
 ]
 
 
@@ -214,6 +216,7 @@ def indicator_findings(data: bytes, location: str) -> list[dict[str, Any]]:
 def indicator_stream(stream: BinaryIO, location: str) -> list[dict[str, Any]]:
     """Scan bounded chunks, retaining context across ASCII and UTF-16 boundaries."""
     found: set[str] = set()
+    raw_values: dict[str, str] = {}
     metadata = stream.read(CHUNK_SIZE)
     stream.seek(0)
     tails = [b'', b'']
@@ -221,16 +224,17 @@ def indicator_stream(stream: BinaryIO, location: str) -> list[dict[str, Any]]:
     while True:
         chunk = stream.read(CHUNK_SIZE)
         eof = not chunk
-        views = [chunk.lower(), chunk.replace(b'\x00', b'').lower()]
+        views = [chunk, chunk.replace(b'\x00', b'')]
         for index, view in enumerate(views):
             data = tails[index] + view
             for algorithm, pattern in PATTERNS:
                 if algorithm in found:
                     continue
-                for match in re.finditer(pattern, data):
+                for match in re.finditer(pattern, data, re.I):
                     at_stream_start = processed[index] == len(tails[index])
                     if (at_stream_start or match.start() > 0) and (eof or match.end() <= len(data) - 128):
                         found.add(algorithm)
+                        raw_values[algorithm] = match.group().decode('ascii', errors='replace')
                         break
             tails[index] = data[-256:]
             processed[index] += len(view)
@@ -241,7 +245,7 @@ def indicator_stream(stream: BinaryIO, location: str) -> list[dict[str, Any]]:
     for algorithm, _ in PATTERNS:
         if algorithm in found:
             priority, advice = recommendation(algorithm)
-            findings.append(dict(algorithm=algorithm, location=location, line=None, evidence='String indicator', priority=priority, recommendation=advice,
+            findings.append(dict(algorithm=algorithm, algorithm_raw=raw_values[algorithm], location=location, line=None, evidence='String indicator', priority=priority, recommendation=advice,
                                  mode=modes[0].decode().upper() if algorithm == 'AES' and modes else None))
     return findings
 
@@ -251,7 +255,7 @@ def perform_scan(folder: Path, record: dict[str, Any]) -> None:
     save_record(folder, record)
     source = folder / 'original'
     work = folder / 'work'
-    work.mkdir(exist_ok=True)
+    work.mkdir(exist_ok=True, mode=0o700)
     findings: list[dict[str, Any]] = []
     skipped = 0
     inspected = 0
@@ -273,12 +277,13 @@ def perform_scan(folder: Path, record: dict[str, Any]) -> None:
         # Decompiler integration: JADX (APK/JAR) or Ghidra (ELF/EXE/DLL)
         # -------------------------------------------------------------------
         decomp_work = folder / 'decompile-work'
-        decomp_work.mkdir(exist_ok=True)
+        decomp_work.mkdir(exist_ok=True, mode=0o700)
         try:
             dr = decompile_and_scan(
                 input_path=source,
                 kind=kind,
                 work_dir=decomp_work,
+                original_name=record['filename'],
             )
             for df in dr.findings:
                 priority_val, advice = recommendation(df['algorithm'])
@@ -286,7 +291,8 @@ def perform_scan(folder: Path, record: dict[str, Any]) -> None:
                     algorithm=df['algorithm'],
                     location=df['location'],
                     line=df.get('line'),
-                    evidence=df['evidence'],
+                    evidence=df['evidence'], scanner=dr.tool, scanner_version=dr.tool_version or 'unknown',
+                    limitations=dr.limitations + ['Static evidence; runtime use NOT CONFIRMED.'],
                     priority=priority_val,
                     recommendation=advice,
                     mode=None,
@@ -318,12 +324,13 @@ def perform_scan(folder: Path, record: dict[str, Any]) -> None:
             # Decompiler integration for APK / JAR archives
             # -------------------------------------------------------------------
             decomp_work = folder / 'decompile-work'
-            decomp_work.mkdir(exist_ok=True)
+            decomp_work.mkdir(exist_ok=True, mode=0o700)
             try:
                 dr = decompile_and_scan(
                     input_path=source,
                     kind=kind,
                     work_dir=decomp_work,
+                    original_name=record['filename'],
                 )
                 for df in dr.findings:
                     priority_val, advice = recommendation(df['algorithm'])
@@ -331,7 +338,8 @@ def perform_scan(folder: Path, record: dict[str, Any]) -> None:
                         algorithm=df['algorithm'],
                         location=df['location'],
                         line=df.get('line'),
-                        evidence=df['evidence'],
+                        evidence=df['evidence'], scanner=dr.tool, scanner_version=dr.tool_version or 'unknown',
+                    limitations=dr.limitations + ['Static evidence; runtime use NOT CONFIRMED.'],
                         priority=priority_val,
                         recommendation=advice,
                         mode=None, key_size=None, curve=None,
@@ -395,37 +403,71 @@ def perform_scan(folder: Path, record: dict[str, Any]) -> None:
                     for envelope in result.envelopes:
                         observation = envelope.observation
                         algorithm = observation.algorithm or observation.algorithm_raw
+                        if not algorithm and observation.observation_type.value == 'hardcoded_material':
+                            findings.append(dict(algorithm='Unknown', asset_type='key', location=location.path if (location := envelope.source_location) else record['filename'],
+                                line=location.line if location else None, evidence='Hardcoded key material indicator; content omitted',
+                                priority='review', recommendation='Review whether key material belongs in this artifact.'))
                         if not algorithm:
                             continue
                         location = envelope.source_location
                         priority, advice = recommendation(algorithm)
                         finding_path = location.path.replace('\\', '/') if location and suffix == '.zip' else record['filename']
-                        findings.append(dict(algorithm=algorithm, location=finding_path, line=location.line if location else None, evidence='Source observation', priority=priority, recommendation=advice, **{key: getattr(observation, key) for key in ['mode', 'key_size', 'curve', 'provider', 'operation', 'padding']}))
+                        values = {key: getattr(observation, key) for key in ['mode', 'key_size', 'curve', 'provider', 'operation', 'padding']}
+                        values['operation'] = observation.operation or {
+                            'signing': 'sign', 'verification': 'verify', 'encryption': 'encrypt',
+                            'decryption': 'decrypt', 'hashing': 'digest', 'key_agreement': 'exchange',
+                            'key_generation': 'keygen', 'key_derivation': 'keyderive',
+                        }.get(observation.observation_type.value)
+                        findings.append(dict(algorithm=algorithm, algorithm_raw=observation.algorithm_raw or algorithm,
+                            location=finding_path, line=location.line if location else None, evidence='Source observation',
+                            scanner=envelope.collector.name, scanner_version=envelope.collector.version,
+                            rule_id=envelope.detection_rule.rule_id if envelope.detection_rule else 'ECDAT-CRYPTO',
+                            rule_version=envelope.detection_rule.rule_version if envelope.detection_rule else '2.0.0',
+                            priority=priority, recommendation=advice, **values))
             asyncio.run(collect())
 
     if not inspected:
         raise ValueError('No supported source files were found in this archive.')
     # Multiple source rules can describe the same call; show one review item.
-    unique = {(f['algorithm'], f['location'], f['line'], f['evidence'], f.get('name'), f.get('version'), f.get('fingerprint'),
-               f.get('mode'), f.get('key_size'), f.get('operation')): f for f in findings}
+    for finding in findings:
+        normalize_finding(finding)
+    unique = {}
+    for f in findings:
+        key = tuple(f.get(name) for name in ['algorithm', 'location', 'line', 'evidence', 'name', 'version', 'fingerprint', 'mode', 'padding', 'key_size', 'operation'])
+        if key in unique:
+            previous = unique[key]
+            previous['observed_aliases'] = sorted(set(previous.get('observed_aliases', [previous['algorithm_raw']]) + [f['algorithm_raw']]))
+        else:
+            unique[key] = f
     findings = list(unique.values())
     if len(findings) > MAX_FINDINGS:
         limitations.append('Only the first 5,000 findings are included.')
     findings = findings[:MAX_FINDINGS]
     findings.sort(key=lambda finding: (finding['priority'] != 'review', finding['algorithm'], finding['location']))
+    coverage_partial = bool(skipped or limitations or kind in {'apk', 'exe', 'library'} or any(f['evidence'] == 'String indicator' for f in findings))
     if kind in {'apk', 'exe'}:
         limitations.append('Static string inspection only. Packed, obfuscated, and runtime-loaded code may hide cryptography. Indicators do not confirm use.')
     else:
         limitations.append('Python and Java use source analysis; other supported languages use string indicators. This scan does not prove the code is secure.')
     limitations.append('Metadata parsing is limited to the first 1 MiB per file. Versions, modes and key sizes remain unknown unless observed. Business context is supplied for the application and inherited by its findings.')
     record['assessment'] = enrich(findings, record.get('context', {}))
-    record['assessment_version'] = 1
+    record['assessment_version'] = 2
     record['policies'] = evaluate_policies(findings, record['id'])
     record['policy_version'] = POLICY_VERSION
+    record['coverage'] = {'status': 'PARTIAL' if coverage_partial else 'COMPLETE',
+                          'analyzed': inspected, 'skipped': skipped,
+                          'opaque_binaries': 1 if kind in {'apk', 'exe', 'library'} else 0,
+                          'packed_encrypted': None, 'unsupported': skipped,
+                          'meaning': 'Zero findings does not mean no cryptography exists. Runtime use is not confirmed.'}
+    from ecdat.core.discovery.provenance import build_provenance
+    record['provenance'] = {'ecdat_version': '0.2.0', 'normalization_version': NORMALIZATION_VERSION,
+                            'policy_version': POLICY_VERSION, 'input_sha256': record.get('sha256'),
+                            'scan_timestamp': record['created_at'], 'standards_profile': 'FIPS 203/204/205; RFC 10024',
+                            'scanner_versions': {f['scanner']: f['scanner_version'] for f in findings}, **build_provenance()}
     record.update(status='completed', completed_at=now(), findings=findings, finding_count=len(findings), review_count=sum(f['priority'] == 'review' for f in findings), inspected_files=inspected, skipped_files=skipped, limitations=limitations)
     (folder / 'report.json').write_text(json.dumps(record, indent=2), encoding='utf-8')
     with (folder / 'findings.csv').open('w', encoding='utf-8', newline='') as stream:
-        writer = csv.DictWriter(stream, fieldnames=['algorithm', 'asset_type', 'version', 'mode', 'key_size', 'priority', 'quantum_status', 'risk_score', 'context', 'mosca', 'evidence', 'location', 'line', 'recommendation', 'tradeoffs'], extrasaction='ignore')
+        writer = csv.DictWriter(stream, fieldnames=['algorithm_raw', 'operation', 'padding', 'curve', 'provider', 'confidence', 'scanner', 'scanner_version', 'rule_id', 'rule_version', 'classical_status', 'quantum_transition_status', 'policy_status', 'planning_priority', 'recommendation_explanation', 'references', 'limitations', 'algorithm', 'asset_type', 'version', 'mode', 'key_size', 'priority', 'quantum_status', 'risk_score', 'context', 'mosca', 'evidence', 'location', 'line', 'recommendation', 'tradeoffs'], extrasaction='ignore')
         writer.writeheader()
         for finding in findings:
             # Prevent spreadsheet formula interpretation of uploaded file names.
@@ -446,7 +488,7 @@ def run_scan(folder: Path, record: dict[str, Any]) -> None:
                 save_record(folder, record)
             perform_scan(folder, record)
     except Exception as exc:
-        logger.exception('Upload scan failed: %s', record['id'])
+        logger.error('Upload scan failed: %s (%s)', record['id'], type(exc).__name__)
         record.update(status='failed', completed_at=now(), error=str(exc) if isinstance(exc, ValueError) else 'The file could not be scanned. Try uploading it again.')
         save_record(folder, record)
     finally:
@@ -473,7 +515,7 @@ def repository_scan(request: RepositoryRequest, background: BackgroundTasks, use
     folder = None
     try:
         folder = storage_root(tenant_id) / str(uuid.uuid4())
-        folder.mkdir()
+        folder.mkdir(mode=0o700)
         filename = url.rsplit('/', 1)[-1].removesuffix('.git') + '.zip'
         record = dict(id=folder.name, tenant_id=tenant_id, filename=filename, kind='git', context=request.context.model_dump(exclude_unset=True), repository_url=url, ref=request.ref.strip(),
                       size=0, sha256=None, snapshot_ready=False, status='queued', created_at=now(), completed_at=None,
@@ -507,7 +549,7 @@ async def upload_scan(background: BackgroundTasks, user: CurrentUser, kind: Lite
     queued = False
     try:
         folder = storage_root(tenant_id) / str(uuid.uuid4())
-        folder.mkdir()
+        folder.mkdir(mode=0o700)
         size = 0
         digest = hashlib.sha256()
         with (folder / 'original').open('wb') as output:
@@ -562,16 +604,23 @@ def upload_config() -> dict[str, int]:
     return {'max_upload_bytes': MAX_UPLOAD, 'max_expanded_bytes': MAX_EXPANDED}
 
 
+@router.get('/uploads/capabilities')
+def scanner_capabilities() -> dict:
+    from ecdat.core.discovery.capabilities import CAPABILITIES
+    return {'version': '2.0.0', 'capabilities': CAPABILITIES,
+            'safety': 'Static inspection only; uploaded application code is never executed.'}
+
+
 @router.get('/uploads/{scan_id}')
 def upload_result(scan_id: uuid.UUID, user: CurrentUser) -> dict[str, Any]:
     return read_record(scan_id, str(user.id))[1]
 
 
 @router.get('/uploads/{scan_id}/artifacts/{artifact}')
-def download_artifact(scan_id: uuid.UUID, artifact: Literal['original', 'report', 'findings', 'cbom', 'sarif', 'checksums'], user: CurrentUser) -> FileResponse:
+def download_artifact(scan_id: uuid.UUID, artifact: Literal['original', 'report', 'findings', 'cbom', 'cbom17', 'sarif', 'checksums'], user: CurrentUser) -> FileResponse:
     folder, record = read_record(scan_id, str(user.id))
     names = {'original': ('original', record['filename'], 'application/octet-stream'), 'report': ('report.json', 'scan-report.json', 'application/json'), 'findings': ('findings.csv', 'findings.csv', 'text/csv')}
-    names.update(cbom=('cbom.json', 'cbom.cdx.json', 'application/json'), sarif=('results.sarif', 'results.sarif', 'application/json'), checksums=('checksums.json', 'checksums.json', 'application/json'))
+    names.update(cbom17=('cbom-1.7.json', 'cbom-1.7.cdx.json', 'application/json'), cbom=('cbom.json', 'cbom.cdx.json', 'application/json'), sarif=('results.sarif', 'results.sarif', 'application/json'), checksums=('checksums.json', 'checksums.json', 'application/json'))
     name, filename, media_type = names[artifact]
     if artifact == 'original' and record['kind'] == 'git' and not record.get('snapshot_ready'):
         raise HTTPException(409, 'The repository snapshot is not available.')

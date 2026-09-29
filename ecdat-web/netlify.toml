@@ -13,19 +13,19 @@
 # -----------------------------------------------------------------------------
 [[redirects]]
   from = "/api/*"
-  to = "https://ecdat-backend.onrender.com/api/:splat"
+  to = "https://ecdat-sjpu.onrender.com/api/:splat"
   status = 200
   force = true
 
 [[redirects]]
   from = "/health"
-  to = "https://ecdat-backend.onrender.com/health"
+  to = "https://ecdat-sjpu.onrender.com/health"
   status = 200
   force = true
 
 [[redirects]]
   from = "/ready"
-  to = "https://ecdat-backend.onrender.com/ready"
+  to = "https://ecdat-sjpu.onrender.com/ready"
   status = 200
   force = true
 

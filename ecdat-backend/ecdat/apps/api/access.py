@@ -79,7 +79,12 @@ async def guard(request: Request, call_next):
     path = request.url.path
     if request.method not in {'GET','HEAD','OPTIONS'}:
         origin = request.headers.get('origin')
-        if (origin and origin not in get_settings().cors_origins) or request.headers.get('sec-fetch-site') == 'cross-site':
+        allowed_origins = {u.rstrip('/') for u in get_settings().cors_origins}
+        origin_clean = origin.rstrip('/') if origin else None
+        if origin_clean:
+            if origin_clean not in allowed_origins and '*' not in get_settings().cors_origins:
+                return JSONResponse({'detail':'Request origin is not allowed.'}, status_code=403)
+        elif request.headers.get('sec-fetch-site') == 'cross-site':
             return JSONResponse({'detail':'Request origin is not allowed.'}, status_code=403)
     protected = path.startswith('/api/') or path in {'/docs','/redoc','/openapi.json'}
     public = path in {'/api/v1/session','/api/v1/health','/api/v1/ready'}

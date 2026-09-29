@@ -14,7 +14,6 @@ dependencies = [
     "pydantic>=2.9.0",
     "pydantic-settings>=2.6.0",
     "python-multipart>=0.0.12",
-
     # HTTP client
     "httpx>=0.28.0",
     # Source scanning
@@ -33,6 +32,7 @@ dependencies = [
     "pyyaml>=6.0.2",
     # Logging
     "structlog>=24.4.0",
+    "jsonschema>=4.26.0",
 ]
 
 [project.optional-dependencies]

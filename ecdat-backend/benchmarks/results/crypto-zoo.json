@@ -1,0 +1,671 @@
+{
+  "cases": 56,
+  "ground_truth": 46,
+  "negative_controls": 12,
+  "metrics": {
+    "tp": 42,
+    "fp": 0,
+    "fn": 4,
+    "precision": 1.0,
+    "recall": 0.9130434782608695,
+    "f1": 0.9545454545454545
+  },
+  "categories": {
+    "Python": {
+      "tp": 14,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1.0,
+      "recall": 0.8235294117647058,
+      "f1": 0.9032258064516129
+    },
+    "Java": {
+      "tp": 18,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.9473684210526315,
+      "f1": 0.972972972972973
+    },
+    "Certificate": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "Binary indicator": {
+      "tp": 6,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    }
+  },
+  "details": [
+    {
+      "file": "python_rsa.py",
+      "expected": [
+        "RSA"
+      ],
+      "actual": [
+        "RSA"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_ec.py",
+      "expected": [
+        "EC"
+      ],
+      "actual": [
+        "EC"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_ecdh.py",
+      "expected": [
+        "ECDH"
+      ],
+      "actual": [
+        "ECDH"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_ecdsa.py",
+      "expected": [
+        "ECDSA"
+      ],
+      "actual": [
+        "ECDSA"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_gcm.py",
+      "expected": [
+        "AES"
+      ],
+      "actual": [
+        "AES"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_cbc.py",
+      "expected": [
+        "AES"
+      ],
+      "actual": [
+        "AES"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_pbkdf.py",
+      "expected": [
+        "PBKDF2"
+      ],
+      "actual": [
+        "PBKDF2"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_pem.py",
+      "expected": [
+        "Unknown"
+      ],
+      "actual": [
+        "Unknown"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_alias.py",
+      "expected": [
+        "AES"
+      ],
+      "actual": [
+        "AES"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_sha256.py",
+      "expected": [
+        "SHA-256"
+      ],
+      "actual": [
+        "SHA-256"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_sha1.py",
+      "expected": [
+        "SHA-1"
+      ],
+      "actual": [
+        "SHA-1"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_md5.py",
+      "expected": [
+        "MD5"
+      ],
+      "actual": [
+        "MD5"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_sha512.py",
+      "expected": [
+        "SHA-512"
+      ],
+      "actual": [
+        "SHA-512"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_sha3_256.py",
+      "expected": [
+        "SHA3-256"
+      ],
+      "actual": [
+        "SHA3-256"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_negative_comment.py",
+      "expected": [],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_negative_labels.py",
+      "expected": [],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_negative_lookalike.py",
+      "expected": [],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_negative_plain.py",
+      "expected": [],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_negative_custom.py",
+      "expected": [],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_negative_nested.py",
+      "expected": [],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_rsa_sign.java",
+      "expected": [
+        "RSA"
+      ],
+      "actual": [
+        "RSA"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_rsa_cipher.java",
+      "expected": [
+        "RSA"
+      ],
+      "actual": [
+        "RSA"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_rsa_key.java",
+      "expected": [
+        "RSA"
+      ],
+      "actual": [
+        "RSA"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_ecdh.java",
+      "expected": [
+        "ECDH"
+      ],
+      "actual": [
+        "ECDH"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_ecdsa.java",
+      "expected": [
+        "ECDSA"
+      ],
+      "actual": [
+        "ECDSA"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_ec.java",
+      "expected": [
+        "EC"
+      ],
+      "actual": [
+        "EC"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_gcm.java",
+      "expected": [
+        "AES"
+      ],
+      "actual": [
+        "AES"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_ecb.java",
+      "expected": [
+        "AES"
+      ],
+      "actual": [
+        "AES"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_cbc.java",
+      "expected": [
+        "AES"
+      ],
+      "actual": [
+        "AES"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_sha256.java",
+      "expected": [
+        "SHA-256"
+      ],
+      "actual": [
+        "SHA-256"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_sha1.java",
+      "expected": [
+        "SHA-1"
+      ],
+      "actual": [
+        "SHA-1"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_desede.java",
+      "expected": [
+        "3DES"
+      ],
+      "actual": [
+        "3DES"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_hmac.java",
+      "expected": [
+        "HMAC"
+      ],
+      "actual": [
+        "HMAC"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_pbkdf.java",
+      "expected": [
+        "PBKDF2"
+      ],
+      "actual": [
+        "PBKDF2"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_mlkem.java",
+      "expected": [
+        "ML-KEM"
+      ],
+      "actual": [
+        "ML-KEM"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_mldsa.java",
+      "expected": [
+        "ML-DSA"
+      ],
+      "actual": [
+        "ML-DSA"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_slhdsa.java",
+      "expected": [
+        "SLH-DSA"
+      ],
+      "actual": [
+        "SLH-DSA"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_kyber.java",
+      "expected": [
+        "Kyber"
+      ],
+      "actual": [
+        "Kyber"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_negative_comment.java",
+      "expected": [],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_negative_string.java",
+      "expected": [],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_negative_name.java",
+      "expected": [],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "Java_negative_plain.java",
+      "expected": [],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "certificate_rsa.pem",
+      "expected": [
+        "RSA"
+      ],
+      "actual": [
+        "RSA"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "certificate_ec.pem",
+      "expected": [
+        "EC"
+      ],
+      "actual": [
+        "EC"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "certificate_expired.pem",
+      "expected": [
+        "RSA"
+      ],
+      "actual": [
+        "RSA"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "encrypted_key.pem",
+      "expected": [
+        "Unknown"
+      ],
+      "actual": [
+        "Unknown"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "binary_rsa.so",
+      "expected": [
+        "RSA"
+      ],
+      "actual": [
+        "RSA"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "binary_aes.so",
+      "expected": [
+        "AES"
+      ],
+      "actual": [
+        "AES"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "binary_sha.so",
+      "expected": [
+        "SHA-256"
+      ],
+      "actual": [
+        "SHA-256"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "binary_pqc.so",
+      "expected": [
+        "ML-DSA",
+        "ML-KEM",
+        "SLH-DSA"
+      ],
+      "actual": [
+        "ML-DSA",
+        "ML-KEM",
+        "SLH-DSA"
+      ],
+      "tp": 3,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "binary_negative.so",
+      "expected": [],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "binary_plain.so",
+      "expected": [],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 0
+    },
+    {
+      "file": "python_dynamic.py",
+      "expected": [
+        "SHA-256"
+      ],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 1
+    },
+    {
+      "file": "python_oqs_kem.py",
+      "expected": [
+        "ML-KEM"
+      ],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 1
+    },
+    {
+      "file": "python_oqs_signature.py",
+      "expected": [
+        "ML-DSA"
+      ],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 1
+    },
+    {
+      "file": "Java_dynamic.java",
+      "expected": [
+        "AES"
+      ],
+      "actual": [],
+      "tp": 0,
+      "fp": 0,
+      "fn": 1
+    }
+  ],
+  "matching": "case file + canonical algorithm; repeated observations collapse within a case",
+  "limitation": "Synthetic discovery benchmark; not evidence of exhaustive production accuracy."
+}

@@ -47,8 +47,8 @@ class MigrationAdvice:
     alternatives: list[PQCAlgorithm]
     hybrid_option: str | None               # e.g. "ECDH + ML-KEM-768"
     migration_effort: str                   # "low" | "medium" | "high"
-    estimated_migration_months: int
-    cnsa2_compliant: bool
+    suggested_complexity: str
+    cnsa2_compliant: bool  # Always false: this catalogue does not certify policy compliance
     urgency_note: str
     references: list[str] = field(default_factory=list)
 
@@ -69,7 +69,7 @@ _ML_KEM_768 = PQCAlgorithm(
     nist_security_level=3, use_cases=["kem", "key_establishment"],
     standard_status="final", production_ready=True,
     public_key_bytes=1184, ciphertext_bytes=1088,
-    notes="NIST Level 3 (AES-192 equivalent). CNSA 2.0 recommended.",
+    notes="NIST Level 3 (AES-192 equivalent). Parameter selection is organization-dependent.",
 )
 _ML_KEM_1024 = PQCAlgorithm(
     name="ML-KEM-1024", family="ML-KEM", fips_number="FIPS 203",
@@ -89,7 +89,7 @@ _ML_DSA_65 = PQCAlgorithm(
     nist_security_level=3, use_cases=["signature", "signing"],
     standard_status="final", production_ready=True,
     public_key_bytes=1952, signature_bytes=3293,
-    notes="CNSA 2.0 recommended for signatures.",
+    notes="Evaluate protocol, interoperability and organizational policy.",
 )
 _ML_DSA_87 = PQCAlgorithm(
     name="ML-DSA-87", family="ML-DSA", fips_number="FIPS 204",
@@ -131,13 +131,13 @@ _AES_256 = PQCAlgorithm(
     name="AES-256", family="AES", fips_number="FIPS 197",
     nist_security_level=5, use_cases=["symmetric_encryption"],
     standard_status="final", production_ready=True,
-    notes="Grover's algorithm halves effective key size — AES-256 → 128-bit QS.",
+    notes="AES-128, AES-192 and AES-256 may continue under current NIST guidance. Review mode and key management.",
 )
 _AES_128 = PQCAlgorithm(
     name="AES-128", family="AES", fips_number="FIPS 197",
     nist_security_level=1, use_cases=["symmetric_encryption"],
     standard_status="final", production_ready=True,
-    notes="AES-128 provides only ~64-bit quantum security. Upgrade to AES-256.",
+    notes="AES-128, AES-192 and AES-256 may continue under current NIST guidance. Review mode and key management.",
 )
 
 
@@ -156,44 +156,44 @@ _ADVICE: dict[tuple[str, str], MigrationAdvice] = {
         from_algorithm="RSA", from_use_case="key_establishment",
         primary_recommendation=_ML_KEM_768,
         alternatives=[_ML_KEM_1024, _ML_KEM_512],
-        hybrid_option="RSA-2048 + ML-KEM-768 (X-Wing)",
+        hybrid_option="Evaluate protocol-supported standardized hybrid; for TLS 1.3 see RFC 10024 (X25519MLKEM768, SecP256r1MLKEM768, SecP384r1MLKEM1024).",
         migration_effort="high",
-        estimated_migration_months=18,
-        cnsa2_compliant=True,
-        urgency_note="RSA key establishment is fully broken by Shor's. Migrate to ML-KEM immediately for any data with lifetime > 5 years.",
+        suggested_complexity="REQUIRES ASSESSMENT",
+        cnsa2_compliant=False,
+        urgency_note="Candidate migration family; confirm operation, protocol, interoperability, performance and organizational policy. Timing requires organization-supplied X/Y/Z.",
         references=[_NIST_REF, _CNSA_REF],
     ),
     ("ECDH", "key_establishment"): MigrationAdvice(
         from_algorithm="ECDH", from_use_case="key_establishment",
         primary_recommendation=_ML_KEM_768,
         alternatives=[_ML_KEM_1024],
-        hybrid_option="ECDH-P384 + ML-KEM-768",
+        hybrid_option="Evaluate protocol-supported standardized hybrid; for TLS 1.3 see RFC 10024 (X25519MLKEM768, SecP256r1MLKEM768, SecP384r1MLKEM1024).",
         migration_effort="medium",
-        estimated_migration_months=12,
-        cnsa2_compliant=True,
-        urgency_note="ECDH is broken by Shor's. Hybrid mode allows backward compatibility during transition.",
+        suggested_complexity="REQUIRES ASSESSMENT",
+        cnsa2_compliant=False,
+        urgency_note="Candidate migration family; confirm operation, protocol, interoperability, performance and organizational policy. Timing requires organization-supplied X/Y/Z.",
         references=[_NIST_REF, _CNSA_REF, _IR8547_REF],
     ),
     ("ECDH", "key_agreement"): MigrationAdvice(
         from_algorithm="ECDH", from_use_case="key_agreement",
         primary_recommendation=_ML_KEM_768,
         alternatives=[_ML_KEM_1024],
-        hybrid_option="ECDH-P384 + ML-KEM-768",
+        hybrid_option="Evaluate protocol-supported standardized hybrid; for TLS 1.3 see RFC 10024 (X25519MLKEM768, SecP256r1MLKEM768, SecP384r1MLKEM1024).",
         migration_effort="medium",
-        estimated_migration_months=12,
-        cnsa2_compliant=True,
-        urgency_note="All elliptic-curve DH schemes are broken by quantum computers.",
+        suggested_complexity="REQUIRES ASSESSMENT",
+        cnsa2_compliant=False,
+        urgency_note="Candidate migration family; confirm operation, protocol, interoperability, performance and organizational policy. Timing requires organization-supplied X/Y/Z.",
         references=[_NIST_REF, _CNSA_REF],
     ),
     ("X25519", "key_agreement"): MigrationAdvice(
         from_algorithm="X25519", from_use_case="key_agreement",
         primary_recommendation=_ML_KEM_768,
         alternatives=[_ML_KEM_512],
-        hybrid_option="X25519 + ML-KEM-768",
+        hybrid_option="Evaluate protocol-supported standardized hybrid; for TLS 1.3 see RFC 10024 (X25519MLKEM768, SecP256r1MLKEM768, SecP384r1MLKEM1024).",
         migration_effort="medium",
-        estimated_migration_months=9,
-        cnsa2_compliant=True,
-        urgency_note="X25519 (Curve25519 DH) is broken by Shor's algorithm.",
+        suggested_complexity="REQUIRES ASSESSMENT",
+        cnsa2_compliant=False,
+        urgency_note="Candidate migration family; confirm operation, protocol, interoperability, performance and organizational policy. Timing requires organization-supplied X/Y/Z.",
         references=[_NIST_REF],
     ),
     ("DH", "key_agreement"): MigrationAdvice(
@@ -202,9 +202,9 @@ _ADVICE: dict[tuple[str, str], MigrationAdvice] = {
         alternatives=[_ML_KEM_1024],
         hybrid_option=None,
         migration_effort="high",
-        estimated_migration_months=24,
-        cnsa2_compliant=True,
-        urgency_note="Classical DH is broken by Shor's. Large legacy codebases may require significant rearchitecting.",
+        suggested_complexity="REQUIRES ASSESSMENT",
+        cnsa2_compliant=False,
+        urgency_note="Candidate migration family; confirm operation, protocol, interoperability, performance and organizational policy. Timing requires organization-supplied X/Y/Z.",
         references=[_NIST_REF, _CNSA_REF],
     ),
     # ── Digital signatures ─────────────────────────────────────────────── #
@@ -212,33 +212,33 @@ _ADVICE: dict[tuple[str, str], MigrationAdvice] = {
         from_algorithm="RSA", from_use_case="signing",
         primary_recommendation=_ML_DSA_65,
         alternatives=[_ML_DSA_87, _SLH_DSA_SHAKE_128S],
-        hybrid_option="RSA-3072 + ML-DSA-65",
+        hybrid_option="Evaluate protocol-supported standardized hybrid; for TLS 1.3 see RFC 10024 (X25519MLKEM768, SecP256r1MLKEM768, SecP384r1MLKEM1024).",
         migration_effort="high",
-        estimated_migration_months=18,
-        cnsa2_compliant=True,
-        urgency_note="RSA signatures are broken by Shor's. Migrate to ML-DSA or SLH-DSA.",
+        suggested_complexity="REQUIRES ASSESSMENT",
+        cnsa2_compliant=False,
+        urgency_note="Candidate migration family; confirm operation, protocol, interoperability, performance and organizational policy. Timing requires organization-supplied X/Y/Z.",
         references=[_NIST_REF, _CNSA_REF],
     ),
     ("ECDSA", "signing"): MigrationAdvice(
         from_algorithm="ECDSA", from_use_case="signing",
         primary_recommendation=_ML_DSA_65,
         alternatives=[_ML_DSA_87, _SLH_DSA_SHAKE_256S],
-        hybrid_option="ECDSA-P384 + ML-DSA-65",
+        hybrid_option="Evaluate protocol-supported standardized hybrid; for TLS 1.3 see RFC 10024 (X25519MLKEM768, SecP256r1MLKEM768, SecP384r1MLKEM1024).",
         migration_effort="medium",
-        estimated_migration_months=12,
-        cnsa2_compliant=True,
-        urgency_note="ECDSA is broken by Shor's. Hybrid approach enables gradual migration.",
+        suggested_complexity="REQUIRES ASSESSMENT",
+        cnsa2_compliant=False,
+        urgency_note="Candidate migration family; confirm operation, protocol, interoperability, performance and organizational policy. Timing requires organization-supplied X/Y/Z.",
         references=[_NIST_REF, _CNSA_REF, _IR8547_REF],
     ),
     ("ED25519", "signing"): MigrationAdvice(
         from_algorithm="Ed25519", from_use_case="signing",
         primary_recommendation=_ML_DSA_44,
         alternatives=[_ML_DSA_65, _SLH_DSA_SHAKE_128S],
-        hybrid_option="Ed25519 + ML-DSA-44",
+        hybrid_option="Evaluate protocol-supported standardized hybrid; for TLS 1.3 see RFC 10024 (X25519MLKEM768, SecP256r1MLKEM768, SecP384r1MLKEM1024).",
         migration_effort="low",
-        estimated_migration_months=6,
-        cnsa2_compliant=False,  # CNSA 2.0 mandates ML-DSA-65+
-        urgency_note="Ed25519 is quantum-vulnerable. ML-DSA-44 is a natural replacement.",
+        suggested_complexity="REQUIRES ASSESSMENT",
+        cnsa2_compliant=False,
+        urgency_note="Candidate migration family; confirm operation, protocol, interoperability, performance and organizational policy. Timing requires organization-supplied X/Y/Z.",
         references=[_NIST_REF],
     ),
     ("DSA", "signing"): MigrationAdvice(
@@ -247,9 +247,9 @@ _ADVICE: dict[tuple[str, str], MigrationAdvice] = {
         alternatives=[_SLH_DSA_SHAKE_256S],
         hybrid_option=None,
         migration_effort="high",
-        estimated_migration_months=24,
-        cnsa2_compliant=True,
-        urgency_note="DSA is deprecated (NIST SP 800-186). Migrate to ML-DSA urgently.",
+        suggested_complexity="REQUIRES ASSESSMENT",
+        cnsa2_compliant=False,
+        urgency_note="Candidate migration family; confirm operation, protocol, interoperability, performance and organizational policy. Timing requires organization-supplied X/Y/Z.",
         references=[_NIST_REF],
     ),
     # ── Hashing ────────────────────────────────────────────────────────── #
@@ -259,9 +259,9 @@ _ADVICE: dict[tuple[str, str], MigrationAdvice] = {
         alternatives=[_SHA_512],
         hybrid_option=None,
         migration_effort="medium",
-        estimated_migration_months=6,
+        suggested_complexity="REQUIRES ASSESSMENT",
         cnsa2_compliant=False,  # SHA-1 disallowed
-        urgency_note="SHA-1 is classically broken (collision attacks). Replace immediately regardless of quantum.",
+        urgency_note="Candidate migration family; confirm operation, protocol, interoperability, performance and organizational policy. Timing requires organization-supplied X/Y/Z.",
         references=["https://csrc.nist.gov/Projects/Hash-Functions"],
     ),
     ("MD5", "hashing"): MigrationAdvice(
@@ -270,9 +270,9 @@ _ADVICE: dict[tuple[str, str], MigrationAdvice] = {
         alternatives=[_SHA_512],
         hybrid_option=None,
         migration_effort="low",
-        estimated_migration_months=3,
+        suggested_complexity="REQUIRES ASSESSMENT",
         cnsa2_compliant=False,
-        urgency_note="MD5 is critically broken — collision attacks trivially feasible. Replace immediately.",
+        urgency_note="Candidate migration family; confirm operation, protocol, interoperability, performance and organizational policy. Timing requires organization-supplied X/Y/Z.",
         references=["https://csrc.nist.gov/Projects/Hash-Functions"],
     ),
     ("SHA-256", "hashing"): MigrationAdvice(
@@ -281,9 +281,9 @@ _ADVICE: dict[tuple[str, str], MigrationAdvice] = {
         alternatives=[_SHA3_256],
         hybrid_option=None,
         migration_effort="low",
-        estimated_migration_months=3,
-        cnsa2_compliant=False,  # CNSA 2.0 requires SHA-384+
-        urgency_note="SHA-256 offers ~128-bit quantum security (Grover). CNSA 2.0 mandates SHA-384+.",
+        suggested_complexity="REQUIRES ASSESSMENT",
+        cnsa2_compliant=False,
+        urgency_note="Candidate migration family; confirm operation, protocol, interoperability, performance and organizational policy. Timing requires organization-supplied X/Y/Z.",
         references=[_CNSA_REF],
     ),
     # ── Symmetric encryption ───────────────────────────────────────────── #
@@ -293,9 +293,9 @@ _ADVICE: dict[tuple[str, str], MigrationAdvice] = {
         alternatives=[],
         hybrid_option=None,
         migration_effort="low",
-        estimated_migration_months=3,
-        cnsa2_compliant=True,
-        urgency_note="AES-128 → AES-256 key size upgrade needed. No algorithm change required.",
+        suggested_complexity="REQUIRES ASSESSMENT",
+        cnsa2_compliant=False,
+        urgency_note="Candidate migration family; confirm operation, protocol, interoperability, performance and organizational policy. Timing requires organization-supplied X/Y/Z.",
         references=[_CNSA_REF],
     ),
     ("DES", "encryption"): MigrationAdvice(
@@ -304,9 +304,9 @@ _ADVICE: dict[tuple[str, str], MigrationAdvice] = {
         alternatives=[],
         hybrid_option=None,
         migration_effort="high",
-        estimated_migration_months=24,
+        suggested_complexity="REQUIRES ASSESSMENT",
         cnsa2_compliant=False,
-        urgency_note="DES is critically broken both classically and quantum. Immediate replacement required.",
+        urgency_note="Candidate migration family; confirm operation, protocol, interoperability, performance and organizational policy. Timing requires organization-supplied X/Y/Z.",
         references=[_CNSA_REF],
     ),
 }
@@ -332,7 +332,7 @@ _USE_CASE_ALIASES = {
 class AdvisoryEngine:
     """Recommends PQC migration paths for classical crypto primitives."""
 
-    def recommend(self, algorithm: str, use_case: str = "signing") -> MigrationAdvice | None:
+    def recommend(self, algorithm: str, use_case: str = "unknown") -> MigrationAdvice | None:
         """Recommend a PQC migration for a given algorithm and use case.
 
         Args:
@@ -342,6 +342,8 @@ class AdvisoryEngine:
         Returns:
             MigrationAdvice or None if no specific advice is available.
         """
+        if algorithm.upper() in {'AES', 'AES-128', 'AES-192', 'AES-256', 'SHA-256'}:
+            return None  # No immediate PQ migration requirement under current guidance.
         normalized_use_case = _USE_CASE_ALIASES.get(use_case.lower(), use_case.lower())
         key = (algorithm.upper(), normalized_use_case)
 
@@ -349,11 +351,11 @@ class AdvisoryEngine:
         if advice:
             return advice
 
-        # Fallback: try just the algorithm with common use cases
-        for fallback_uc in ["signing", "key_establishment", "hashing", "encryption"]:
-            fallback = _ADVICE.get((algorithm.upper(), fallback_uc))
-            if fallback:
-                return fallback
+        # Only algorithm families with an unambiguous operation may use a fallback.
+        inferred = {'ECDH': 'key_agreement', 'DH': 'key_agreement', 'X25519': 'key_agreement',
+                    'ECDSA': 'signing', 'ED25519': 'signing', 'DSA': 'signing'}.get(algorithm.upper())
+        if inferred and normalized_use_case == 'unknown':
+            return _ADVICE.get((algorithm.upper(), inferred))
 
         return None
 

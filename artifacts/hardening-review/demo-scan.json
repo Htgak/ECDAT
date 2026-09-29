@@ -1,0 +1,1275 @@
+{
+  "id": "708bf77a-88e6-4a42-839b-f436d481280b",
+  "filename": "QuantumReady-DemoCorp.zip",
+  "kind": "source",
+  "context": {
+    "application_name": "Payment Gateway",
+    "owner": "DemoCorp Security",
+    "protection_lifetime_years": 10,
+    "migration_years": 3,
+    "quantum_horizon_years": 10,
+    "criticality": "critical",
+    "sensitivity": "restricted",
+    "exposure": "external"
+  },
+  "created_at": "2026-09-29T17:34:15.773886+00:00",
+  "size": 3158,
+  "sha256": "31f83b709d6b0d82ce9e06d9e3ca173fed60bb40da4705b151bec88d8e74add3",
+  "error": null,
+  "status": "completed",
+  "decompilation_report": {
+    "tool": "not_applicable",
+    "tool_version": "",
+    "decompiled_files": 0,
+    "decompiled_lines": 0,
+    "findings_from_decompiler": 0,
+    "limitations": []
+  },
+  "assessment": {
+    "asset_types": {
+      "algorithm": 8,
+      "certificate": 2,
+      "library": 1
+    },
+    "quantum_vulnerable": 5,
+    "act_now": 5,
+    "legacy": 2,
+    "pqc_standardized": 2,
+    "needs_context": 4,
+    "migration_priority": {
+      "Urgent": 5,
+      "High": 2,
+      "Monitor": 4
+    },
+    "context": {
+      "protection_lifetime_years": 10.0,
+      "migration_years": 3.0,
+      "quantum_horizon_years": 10.0,
+      "criticality": "critical",
+      "exposure": "external",
+      "sensitivity": "restricted",
+      "application_name": "Payment Gateway",
+      "owner": "DemoCorp Security"
+    }
+  },
+  "assessment_version": 1,
+  "policies": [
+    {
+      "id": "708bf77a-88e6-4a42-839b-f436d481280b:d4c3b83d7a19a50ba5c885e8:PQC-MIGRATION-001",
+      "scan_id": "708bf77a-88e6-4a42-839b-f436d481280b",
+      "asset_id": "d4c3b83d7a19a50ba5c885e8",
+      "asset_algorithm": "ECDH",
+      "location": "identity-service/Identity.py",
+      "rule_id": "PQC-MIGRATION-001",
+      "rule_name": "Review quantum-vulnerable public keys",
+      "standard": "ECDAT review baseline",
+      "policy_version": "2.0.0",
+      "severity": "MEDIUM",
+      "verdict": "warn",
+      "offending_property": "algorithm",
+      "offending_value": "ECDH",
+      "explanation": "Confirm operation and plan a supported PQC or hybrid migration.",
+      "created_at": "2026-09-29T17:34:15.988302+00:00",
+      "evidence": "Source observation",
+      "engine": "local-deterministic"
+    },
+    {
+      "id": "708bf77a-88e6-4a42-839b-f436d481280b:dbfabecc6efa5176041e7a3c:CRYPTO-RSA-001",
+      "scan_id": "708bf77a-88e6-4a42-839b-f436d481280b",
+      "asset_id": "dbfabecc6efa5176041e7a3c",
+      "asset_algorithm": "RSA",
+      "location": "binary/crypto.so",
+      "rule_id": "CRYPTO-RSA-001",
+      "rule_name": "RSA minimum key length",
+      "standard": "ECDAT review baseline",
+      "policy_version": "2.0.0",
+      "severity": "HIGH",
+      "verdict": "unknown",
+      "offending_property": "key_size",
+      "offending_value": null,
+      "explanation": "RSA key length must be at least 2048 bits. Passing this rule does not establish quantum resistance.",
+      "created_at": "2026-09-29T17:34:15.988302+00:00",
+      "evidence": "String indicator",
+      "engine": "local-deterministic"
+    },
+    {
+      "id": "708bf77a-88e6-4a42-839b-f436d481280b:dbfabecc6efa5176041e7a3c:PQC-MIGRATION-001",
+      "scan_id": "708bf77a-88e6-4a42-839b-f436d481280b",
+      "asset_id": "dbfabecc6efa5176041e7a3c",
+      "asset_algorithm": "RSA",
+      "location": "binary/crypto.so",
+      "rule_id": "PQC-MIGRATION-001",
+      "rule_name": "Review quantum-vulnerable public keys",
+      "standard": "ECDAT review baseline",
+      "policy_version": "2.0.0",
+      "severity": "MEDIUM",
+      "verdict": "warn",
+      "offending_property": "algorithm",
+      "offending_value": "RSA",
+      "explanation": "Confirm operation and plan a supported PQC or hybrid migration.",
+      "created_at": "2026-09-29T17:34:15.988302+00:00",
+      "evidence": "String indicator",
+      "engine": "local-deterministic"
+    },
+    {
+      "id": "708bf77a-88e6-4a42-839b-f436d481280b:3788d5440391842fee626126:CRYPTO-LEGACY-001",
+      "scan_id": "708bf77a-88e6-4a42-839b-f436d481280b",
+      "asset_id": "3788d5440391842fee626126",
+      "asset_algorithm": "SHA-1",
+      "location": "legacy-ingest/checksum.py",
+      "rule_id": "CRYPTO-LEGACY-001",
+      "rule_name": "Review legacy cryptography",
+      "standard": "ECDAT review baseline",
+      "policy_version": "2.0.0",
+      "severity": "HIGH",
+      "verdict": "warn",
+      "offending_property": "algorithm",
+      "offending_value": "SHA-1",
+      "explanation": "Review security-sensitive use of this legacy primitive.",
+      "created_at": "2026-09-29T17:34:15.988302+00:00",
+      "evidence": "Source observation",
+      "engine": "local-deterministic"
+    },
+    {
+      "id": "708bf77a-88e6-4a42-839b-f436d481280b:abc0dd1ff840ab3932363700:CRYPTO-LEGACY-001",
+      "scan_id": "708bf77a-88e6-4a42-839b-f436d481280b",
+      "asset_id": "abc0dd1ff840ab3932363700",
+      "asset_algorithm": "3DES",
+      "location": "legacy-ingest/Legacy.java",
+      "rule_id": "CRYPTO-LEGACY-001",
+      "rule_name": "Review legacy cryptography",
+      "standard": "ECDAT review baseline",
+      "policy_version": "2.0.0",
+      "severity": "HIGH",
+      "verdict": "fail",
+      "offending_property": "algorithm",
+      "offending_value": "3DES",
+      "explanation": "Review security-sensitive use of this legacy primitive.",
+      "created_at": "2026-09-29T17:34:15.988302+00:00",
+      "evidence": "Source observation",
+      "engine": "local-deterministic"
+    },
+    {
+      "id": "708bf77a-88e6-4a42-839b-f436d481280b:b1ee703b01486a4e5359964f:PQC-MIGRATION-001",
+      "scan_id": "708bf77a-88e6-4a42-839b-f436d481280b",
+      "asset_id": "b1ee703b01486a4e5359964f",
+      "asset_algorithm": "EC",
+      "location": "certificates/ec.pem",
+      "rule_id": "PQC-MIGRATION-001",
+      "rule_name": "Review quantum-vulnerable public keys",
+      "standard": "ECDAT review baseline",
+      "policy_version": "2.0.0",
+      "severity": "MEDIUM",
+      "verdict": "warn",
+      "offending_property": "algorithm",
+      "offending_value": "EC",
+      "explanation": "Confirm operation and plan a supported PQC or hybrid migration.",
+      "created_at": "2026-09-29T17:34:15.988302+00:00",
+      "evidence": "Parsed X.509 certificate",
+      "engine": "local-deterministic"
+    },
+    {
+      "id": "708bf77a-88e6-4a42-839b-f436d481280b:304b1cab6031526278446934:CRYPTO-RSA-001",
+      "scan_id": "708bf77a-88e6-4a42-839b-f436d481280b",
+      "asset_id": "304b1cab6031526278446934",
+      "asset_algorithm": "RSA",
+      "location": "certificates/rsa.pem",
+      "rule_id": "CRYPTO-RSA-001",
+      "rule_name": "RSA minimum key length",
+      "standard": "ECDAT review baseline",
+      "policy_version": "2.0.0",
+      "severity": "HIGH",
+      "verdict": "pass",
+      "offending_property": "key_size",
+      "offending_value": "2048",
+      "explanation": "RSA key length must be at least 2048 bits. Passing this rule does not establish quantum resistance.",
+      "created_at": "2026-09-29T17:34:15.988302+00:00",
+      "evidence": "Parsed X.509 certificate",
+      "engine": "local-deterministic"
+    },
+    {
+      "id": "708bf77a-88e6-4a42-839b-f436d481280b:304b1cab6031526278446934:PQC-MIGRATION-001",
+      "scan_id": "708bf77a-88e6-4a42-839b-f436d481280b",
+      "asset_id": "304b1cab6031526278446934",
+      "asset_algorithm": "RSA",
+      "location": "certificates/rsa.pem",
+      "rule_id": "PQC-MIGRATION-001",
+      "rule_name": "Review quantum-vulnerable public keys",
+      "standard": "ECDAT review baseline",
+      "policy_version": "2.0.0",
+      "severity": "MEDIUM",
+      "verdict": "warn",
+      "offending_property": "algorithm",
+      "offending_value": "RSA",
+      "explanation": "Confirm operation and plan a supported PQC or hybrid migration.",
+      "created_at": "2026-09-29T17:34:15.988302+00:00",
+      "evidence": "Parsed X.509 certificate",
+      "engine": "local-deterministic"
+    },
+    {
+      "id": "708bf77a-88e6-4a42-839b-f436d481280b:bcc7cb0f0da43ee5fb129a30:CRYPTO-RSA-001",
+      "scan_id": "708bf77a-88e6-4a42-839b-f436d481280b",
+      "asset_id": "bcc7cb0f0da43ee5fb129a30",
+      "asset_algorithm": "RSA",
+      "location": "payment-service/PaymentService.java",
+      "rule_id": "CRYPTO-RSA-001",
+      "rule_name": "RSA minimum key length",
+      "standard": "ECDAT review baseline",
+      "policy_version": "2.0.0",
+      "severity": "HIGH",
+      "verdict": "unknown",
+      "offending_property": "key_size",
+      "offending_value": null,
+      "explanation": "RSA key length must be at least 2048 bits. Passing this rule does not establish quantum resistance.",
+      "created_at": "2026-09-29T17:34:15.988302+00:00",
+      "evidence": "Source observation",
+      "engine": "local-deterministic"
+    },
+    {
+      "id": "708bf77a-88e6-4a42-839b-f436d481280b:bcc7cb0f0da43ee5fb129a30:PQC-MIGRATION-001",
+      "scan_id": "708bf77a-88e6-4a42-839b-f436d481280b",
+      "asset_id": "bcc7cb0f0da43ee5fb129a30",
+      "asset_algorithm": "RSA",
+      "location": "payment-service/PaymentService.java",
+      "rule_id": "PQC-MIGRATION-001",
+      "rule_name": "Review quantum-vulnerable public keys",
+      "standard": "ECDAT review baseline",
+      "policy_version": "2.0.0",
+      "severity": "MEDIUM",
+      "verdict": "warn",
+      "offending_property": "algorithm",
+      "offending_value": "RSA",
+      "explanation": "Confirm operation and plan a supported PQC or hybrid migration.",
+      "created_at": "2026-09-29T17:34:15.988302+00:00",
+      "evidence": "Source observation",
+      "engine": "local-deterministic"
+    }
+  ],
+  "policy_version": "2.0.0",
+  "coverage": {
+    "status": "PARTIAL",
+    "analyzed": 11,
+    "skipped": 0,
+    "opaque_binaries": 0,
+    "packed_encrypted": null,
+    "unsupported": 0,
+    "meaning": "Zero findings does not mean no cryptography exists. Runtime use is not confirmed."
+  },
+  "provenance": {
+    "ecdat_version": "0.2.0",
+    "normalization_version": "2.0.0",
+    "policy_version": "2.0.0",
+    "input_sha256": "31f83b709d6b0d82ce9e06d9e3ca173fed60bb40da4705b151bec88d8e74add3",
+    "scan_timestamp": "2026-09-29T17:34:15.773886+00:00",
+    "standards_profile": "FIPS 203/204/205; RFC 10024",
+    "scanner_versions": {
+      "python-source": "1.0.0",
+      "bounded-static-indicators": "2.0.0",
+      "java-source": "1.0.0",
+      "metadata-parser": "2.0.0"
+    },
+    "git_commit": "14da8a9e8384910218a1935701272cfd8e7d7044",
+    "scanner_source_sha256": "95ff5b63fbb08ca28443f0580593393f1c81fb36c8a810f954e2f29d6719c4f8",
+    "revision_note": "Source hash identifies these files; Git commit alone may exclude working-tree edits."
+  },
+  "completed_at": "2026-09-29T17:34:16.175128+00:00",
+  "findings": [
+    {
+      "algorithm": "ECDH",
+      "algorithm_raw": "ECDH",
+      "location": "identity-service/Identity.py",
+      "line": 2,
+      "evidence": "Source observation",
+      "scanner": "python-source",
+      "scanner_version": "1.0.0",
+      "rule_id": "PY-ECDH-001",
+      "rule_version": "1.0",
+      "priority": "review",
+      "recommendation": "Evaluate ML-KEM for key establishment, with a protocol-supported classical/PQC hybrid during transition. Candidate migration family. Final selection depends on protocol, interoperability, performance and organizational policy.",
+      "mode": null,
+      "key_size": null,
+      "curve": null,
+      "provider": null,
+      "operation": "exchange",
+      "padding": null,
+      "family": "asymmetric",
+      "standard_status": "not_applicable",
+      "normalization_version": "2.0.0",
+      "hash_algorithm": null,
+      "asset_type": "algorithm",
+      "confidence": "observed",
+      "id": "d4c3b83d7a19a50ba5c885e8",
+      "context": {
+        "protection_lifetime_years": 10.0,
+        "migration_years": 3.0,
+        "quantum_horizon_years": 10.0,
+        "criticality": "critical",
+        "exposure": "external",
+        "sensitivity": "restricted",
+        "application_name": "Payment Gateway",
+        "owner": "DemoCorp Security"
+      },
+      "quantum_status": "vulnerable",
+      "sensitive_data_risk": "Potential harvest-now-decrypt-later exposure: confirm this primitive protects confidential data in transit or at rest.",
+      "quantum_transition_status": "quantum_vulnerable_public_key",
+      "classical_status": "REVIEW REQUIRED",
+      "policy_status": "NOT ASSESSED: organization-specific policy not supplied",
+      "runtime_use": "NOT CONFIRMED",
+      "limitations": [
+        "Static evidence does not establish runtime use or security."
+      ],
+      "mosca": {
+        "applicable": true,
+        "verdict": "act_now",
+        "x_years": 10.0,
+        "y_years": 3.0,
+        "z_years": 10.0,
+        "margin_years": -3.0,
+        "basis": "Z is an organization-selected planning scenario, not a prediction of Q-Day.",
+        "formula": "Margin = Z - (X + Y); X = required protection lifetime; Y = migration duration"
+      },
+      "risk_score": 100,
+      "alternatives": [
+        "ML-KEM",
+        "Protocol-supported hybrid"
+      ],
+      "migration_effort": "medium",
+      "tradeoffs": "Benchmark latency, bandwidth, memory and operating costs before selecting parameters; estimates are not measurements.",
+      "references": [
+        "https://csrc.nist.gov/pubs/fips/203/final",
+        "https://csrc.nist.gov/pubs/fips/204/final",
+        "https://csrc.nist.gov/pubs/fips/205/final"
+      ],
+      "recommendation_explanation": {
+        "recommendation": "Evaluate ML-KEM for key establishment, with a protocol-supported classical/PQC hybrid during transition. Candidate migration family. Final selection depends on protocol, interoperability, performance and organizational policy.",
+        "because": [
+          "ECDH observed",
+          "operation = exchange",
+          "quantum status = quantum_vulnerable_public_key",
+          "Mosca margin = -3.0 years"
+        ],
+        "standard_basis": [
+          "https://csrc.nist.gov/pubs/fips/203/final",
+          "https://csrc.nist.gov/pubs/fips/204/final",
+          "https://csrc.nist.gov/pubs/fips/205/final"
+        ]
+      },
+      "context_source": "user",
+      "planning_priority": {
+        "score": 100,
+        "model": "ECDAT Planning Priority v1",
+        "breakdown": {
+          "temporal": 40,
+          "criticality": 25,
+          "sensitivity": 20,
+          "exposure": 15
+        },
+        "meaning": "Planning Priority Score, not probability of attack and not a security certification."
+      },
+      "migration_priority": "Urgent"
+    },
+    {
+      "algorithm": "RSA",
+      "algorithm_raw": "RSA",
+      "location": "binary/crypto.so",
+      "line": null,
+      "evidence": "String indicator",
+      "priority": "review",
+      "recommendation": "Confirm whether this primitive signs or establishes keys. Evaluate ML-DSA for signatures or ML-KEM for key establishment. Candidate migration family. Final selection depends on protocol, interoperability, performance and organizational policy.",
+      "mode": null,
+      "family": "asymmetric",
+      "standard_status": "not_applicable",
+      "normalization_version": "2.0.0",
+      "padding": null,
+      "operation": null,
+      "hash_algorithm": null,
+      "asset_type": "algorithm",
+      "confidence": "indicator",
+      "id": "dbfabecc6efa5176041e7a3c",
+      "context": {
+        "protection_lifetime_years": 10.0,
+        "migration_years": 3.0,
+        "quantum_horizon_years": 10.0,
+        "criticality": "critical",
+        "exposure": "external",
+        "sensitivity": "restricted",
+        "application_name": "Payment Gateway",
+        "owner": "DemoCorp Security"
+      },
+      "quantum_status": "vulnerable",
+      "sensitive_data_risk": "Potential harvest-now-decrypt-later exposure: confirm this primitive protects confidential data in transit or at rest.",
+      "quantum_transition_status": "quantum_vulnerable_public_key",
+      "classical_status": "REVIEW REQUIRED",
+      "policy_status": "NOT ASSESSED: organization-specific policy not supplied",
+      "runtime_use": "NOT CONFIRMED",
+      "scanner": "bounded-static-indicators",
+      "scanner_version": "2.0.0",
+      "rule_id": "ECDAT-CRYPTO",
+      "rule_version": "2.0.0",
+      "limitations": [
+        "Static evidence does not establish runtime use or security."
+      ],
+      "mosca": {
+        "applicable": true,
+        "verdict": "act_now",
+        "x_years": 10.0,
+        "y_years": 3.0,
+        "z_years": 10.0,
+        "margin_years": -3.0,
+        "basis": "Z is an organization-selected planning scenario, not a prediction of Q-Day.",
+        "formula": "Margin = Z - (X + Y); X = required protection lifetime; Y = migration duration"
+      },
+      "risk_score": 100,
+      "alternatives": [
+        "ML-KEM (key establishment)",
+        "ML-DSA (signatures)"
+      ],
+      "migration_effort": "medium",
+      "tradeoffs": "Benchmark latency, bandwidth, memory and operating costs before selecting parameters; estimates are not measurements.",
+      "references": [
+        "https://csrc.nist.gov/pubs/fips/203/final",
+        "https://csrc.nist.gov/pubs/fips/204/final",
+        "https://csrc.nist.gov/pubs/fips/205/final"
+      ],
+      "recommendation_explanation": {
+        "recommendation": "Confirm whether this primitive signs or establishes keys. Evaluate ML-DSA for signatures or ML-KEM for key establishment. Candidate migration family. Final selection depends on protocol, interoperability, performance and organizational policy.",
+        "because": [
+          "RSA observed",
+          "operation = unknown",
+          "quantum status = quantum_vulnerable_public_key",
+          "Mosca margin = -3.0 years"
+        ],
+        "standard_basis": [
+          "https://csrc.nist.gov/pubs/fips/203/final",
+          "https://csrc.nist.gov/pubs/fips/204/final",
+          "https://csrc.nist.gov/pubs/fips/205/final"
+        ]
+      },
+      "context_source": "user",
+      "planning_priority": {
+        "score": 100,
+        "model": "ECDAT Planning Priority v1",
+        "breakdown": {
+          "temporal": 40,
+          "criticality": 25,
+          "sensitivity": 20,
+          "exposure": 15
+        },
+        "meaning": "Planning Priority Score, not probability of attack and not a security certification."
+      },
+      "migration_priority": "Urgent"
+    },
+    {
+      "algorithm": "SHA-1",
+      "algorithm_raw": "SHA-1",
+      "location": "legacy-ingest/checksum.py",
+      "line": 2,
+      "evidence": "Source observation",
+      "scanner": "python-source",
+      "scanner_version": "1.0.0",
+      "rule_id": "PY-SHA1-001",
+      "rule_version": "1.0",
+      "priority": "review",
+      "recommendation": "Review usage: collision-sensitive integrity/signatures require migration; a non-security checksum is not the same risk. HMAC requires a separate policy assessment. Replace security-sensitive hashing with SHA-256 or stronger; use a password KDF for passwords.",
+      "mode": null,
+      "key_size": null,
+      "curve": null,
+      "provider": null,
+      "operation": "digest",
+      "padding": null,
+      "family": "hash",
+      "standard_status": "not_applicable",
+      "normalization_version": "2.0.0",
+      "hash_algorithm": null,
+      "asset_type": "algorithm",
+      "confidence": "observed",
+      "id": "3788d5440391842fee626126",
+      "context": {
+        "protection_lifetime_years": 10.0,
+        "migration_years": 3.0,
+        "quantum_horizon_years": 10.0,
+        "criticality": "critical",
+        "exposure": "external",
+        "sensitivity": "restricted",
+        "application_name": "Payment Gateway",
+        "owner": "DemoCorp Security"
+      },
+      "quantum_status": "not_assessed",
+      "sensitive_data_risk": "Sensitive-data impact requires usage and configuration review.",
+      "quantum_transition_status": "not_assessed",
+      "classical_status": "REVIEW REQUIRED",
+      "policy_status": "NOT ASSESSED: organization-specific policy not supplied",
+      "runtime_use": "NOT CONFIRMED",
+      "limitations": [
+        "Static evidence does not establish runtime use or security."
+      ],
+      "mosca": {
+        "applicable": false,
+        "verdict": "not_applicable",
+        "x_years": 10.0,
+        "y_years": 3.0,
+        "z_years": 10.0,
+        "margin_years": -3.0,
+        "basis": "Z is an organization-selected planning scenario, not a prediction of Q-Day.",
+        "formula": "Margin = Z - (X + Y); X = required protection lifetime; Y = migration duration"
+      },
+      "risk_score": 100,
+      "alternatives": [
+        "SHA-256 / SHA-384"
+      ],
+      "migration_effort": "medium",
+      "tradeoffs": "Benchmark latency, bandwidth, memory and operating costs before selecting parameters; estimates are not measurements.",
+      "references": [],
+      "recommendation_explanation": {
+        "recommendation": "Review usage: collision-sensitive integrity/signatures require migration; a non-security checksum is not the same risk. HMAC requires a separate policy assessment. Replace security-sensitive hashing with SHA-256 or stronger; use a password KDF for passwords.",
+        "because": [
+          "SHA-1 observed",
+          "operation = digest",
+          "quantum status = not_assessed",
+          "Mosca margin = -3.0 years"
+        ],
+        "standard_basis": []
+      },
+      "context_source": "user",
+      "planning_priority": {
+        "score": 100,
+        "model": "ECDAT Planning Priority v1",
+        "breakdown": {
+          "temporal": 40,
+          "criticality": 25,
+          "sensitivity": 20,
+          "exposure": 15
+        },
+        "meaning": "Planning Priority Score, not probability of attack and not a security certification."
+      },
+      "migration_priority": "High"
+    },
+    {
+      "algorithm": "3DES",
+      "algorithm_raw": "DESede/CBC/PKCS5Padding",
+      "location": "legacy-ingest/Legacy.java",
+      "line": 1,
+      "evidence": "Source observation",
+      "scanner": "java-source",
+      "scanner_version": "1.0.0",
+      "rule_id": "JAVA-DES-001",
+      "rule_version": "1.0",
+      "priority": "review",
+      "recommendation": "Replace legacy encryption with an authenticated cipher such as AES-256-GCM; review nonce and key management.",
+      "mode": "CBC",
+      "key_size": null,
+      "curve": null,
+      "provider": null,
+      "operation": "encrypt",
+      "padding": "PKCS5Padding",
+      "family": "symmetric",
+      "standard_status": "not_applicable",
+      "normalization_version": "2.0.0",
+      "hash_algorithm": null,
+      "asset_type": "algorithm",
+      "confidence": "observed",
+      "id": "abc0dd1ff840ab3932363700",
+      "context": {
+        "protection_lifetime_years": 10.0,
+        "migration_years": 3.0,
+        "quantum_horizon_years": 10.0,
+        "criticality": "critical",
+        "exposure": "external",
+        "sensitivity": "restricted",
+        "application_name": "Payment Gateway",
+        "owner": "DemoCorp Security"
+      },
+      "quantum_status": "not_assessed",
+      "sensitive_data_risk": "Sensitive-data impact requires usage and configuration review.",
+      "quantum_transition_status": "not_assessed",
+      "classical_status": "DEPRECATED",
+      "policy_status": "NOT ASSESSED: organization-specific policy not supplied",
+      "runtime_use": "NOT CONFIRMED",
+      "limitations": [
+        "Static evidence does not establish runtime use or security."
+      ],
+      "mosca": {
+        "applicable": false,
+        "verdict": "not_applicable",
+        "x_years": 10.0,
+        "y_years": 3.0,
+        "z_years": 10.0,
+        "margin_years": -3.0,
+        "basis": "Z is an organization-selected planning scenario, not a prediction of Q-Day.",
+        "formula": "Margin = Z - (X + Y); X = required protection lifetime; Y = migration duration"
+      },
+      "risk_score": 100,
+      "alternatives": [
+        "AES-256-GCM",
+        "ChaCha20-Poly1305"
+      ],
+      "migration_effort": "medium",
+      "tradeoffs": "Benchmark latency, bandwidth, memory and operating costs before selecting parameters; estimates are not measurements.",
+      "references": [],
+      "recommendation_explanation": {
+        "recommendation": "Replace legacy encryption with an authenticated cipher such as AES-256-GCM; review nonce and key management.",
+        "because": [
+          "3DES observed",
+          "operation = encrypt",
+          "quantum status = not_assessed",
+          "Mosca margin = -3.0 years"
+        ],
+        "standard_basis": []
+      },
+      "context_source": "user",
+      "planning_priority": {
+        "score": 100,
+        "model": "ECDAT Planning Priority v1",
+        "breakdown": {
+          "temporal": 40,
+          "criticality": 25,
+          "sensitivity": 20,
+          "exposure": 15
+        },
+        "meaning": "Planning Priority Score, not probability of attack and not a security certification."
+      },
+      "migration_priority": "High"
+    },
+    {
+      "algorithm": "AES",
+      "algorithm_raw": "AES/GCM/NoPadding",
+      "location": "secure-storage/Storage.py",
+      "line": 2,
+      "evidence": "Source observation",
+      "scanner": "python-source",
+      "scanner_version": "1.0.0",
+      "rule_id": "PY-AESGCM-001",
+      "rule_version": "1.0",
+      "priority": "info",
+      "recommendation": "AES-128, AES-192 and AES-256 have no immediate PQ migration requirement under current NIST guidance. Review mode, nonce and key management; stronger choices may be an organizational policy requirement.",
+      "mode": "GCM",
+      "key_size": null,
+      "curve": null,
+      "provider": null,
+      "operation": "encrypt",
+      "padding": "NoPadding",
+      "family": "symmetric",
+      "standard_status": "not_applicable",
+      "normalization_version": "2.0.0",
+      "hash_algorithm": null,
+      "asset_type": "algorithm",
+      "confidence": "observed",
+      "id": "56b7aea43d9015e0a42f62c6",
+      "context": {
+        "protection_lifetime_years": 10.0,
+        "migration_years": 3.0,
+        "quantum_horizon_years": 10.0,
+        "criticality": "critical",
+        "exposure": "external",
+        "sensitivity": "restricted",
+        "application_name": "Payment Gateway",
+        "owner": "DemoCorp Security"
+      },
+      "quantum_status": "quantum_resistant_under_current_guidance",
+      "sensitive_data_risk": "Sensitive-data impact requires usage and configuration review.",
+      "quantum_transition_status": "quantum_resistant_under_current_guidance",
+      "classical_status": "REVIEW REQUIRED",
+      "policy_status": "NOT ASSESSED: organization-specific policy not supplied",
+      "runtime_use": "NOT CONFIRMED",
+      "limitations": [
+        "Static evidence does not establish runtime use or security."
+      ],
+      "mosca": {
+        "applicable": false,
+        "verdict": "not_applicable",
+        "x_years": 10.0,
+        "y_years": 3.0,
+        "z_years": 10.0,
+        "margin_years": -3.0,
+        "basis": "Z is an organization-selected planning scenario, not a prediction of Q-Day.",
+        "formula": "Margin = Z - (X + Y); X = required protection lifetime; Y = migration duration"
+      },
+      "risk_score": 68,
+      "alternatives": [
+        "AES-256-GCM (authenticated encryption)"
+      ],
+      "migration_effort": "requires assessment",
+      "tradeoffs": "Benchmark latency, bandwidth, memory and operating costs before selecting parameters; estimates are not measurements.",
+      "references": [
+        "https://csrc.nist.gov/Projects/Post-Quantum-Cryptography/faqs"
+      ],
+      "recommendation_explanation": {
+        "recommendation": "AES-128, AES-192 and AES-256 have no immediate PQ migration requirement under current NIST guidance. Review mode, nonce and key management; stronger choices may be an organizational policy requirement.",
+        "because": [
+          "AES observed",
+          "operation = encrypt",
+          "quantum status = quantum_resistant_under_current_guidance",
+          "Mosca margin = -3.0 years"
+        ],
+        "standard_basis": [
+          "https://csrc.nist.gov/Projects/Post-Quantum-Cryptography/faqs"
+        ]
+      },
+      "context_source": "user",
+      "planning_priority": {
+        "score": 68,
+        "model": "ECDAT Planning Priority v1",
+        "breakdown": {
+          "temporal": 8.0,
+          "criticality": 25,
+          "sensitivity": 20,
+          "exposure": 15
+        },
+        "meaning": "Planning Priority Score, not probability of attack and not a security certification."
+      },
+      "migration_priority": "Monitor"
+    },
+    {
+      "algorithm": "EC",
+      "asset_type": "certificate",
+      "evidence": "Parsed X.509 certificate",
+      "location": "certificates/ec.pem",
+      "line": null,
+      "priority": "review",
+      "recommendation": "Confirm whether this primitive signs or establishes keys. Evaluate ML-DSA for signatures or ML-KEM for key establishment. Candidate migration family. Final selection depends on protocol, interoperability, performance and organizational policy.",
+      "key_size": 256,
+      "version": "v3",
+      "subject": "CN=fixture.invalid",
+      "issuer": "CN=fixture.invalid",
+      "serial": "143",
+      "valid_from": "2020-01-01T00:00:00+00:00",
+      "signature_algorithm": "1.2.840.10045.4.3.2",
+      "curve": "secp256r1",
+      "fingerprint": "9e2d4aefd8c6df0cf48f9344c31d2899f19a486e7dc4676a37a509f8ea669a0f",
+      "expires_at": "2030-01-01T00:00:00+00:00",
+      "algorithm_raw": "EC",
+      "family": "elliptic-curve",
+      "standard_status": "not_applicable",
+      "normalization_version": "2.0.0",
+      "mode": null,
+      "padding": null,
+      "operation": null,
+      "hash_algorithm": null,
+      "confidence": "observed",
+      "id": "b1ee703b01486a4e5359964f",
+      "context": {
+        "protection_lifetime_years": 10.0,
+        "migration_years": 3.0,
+        "quantum_horizon_years": 10.0,
+        "criticality": "critical",
+        "exposure": "external",
+        "sensitivity": "restricted",
+        "application_name": "Payment Gateway",
+        "owner": "DemoCorp Security"
+      },
+      "quantum_status": "vulnerable",
+      "sensitive_data_risk": "Potential harvest-now-decrypt-later exposure: confirm this primitive protects confidential data in transit or at rest.",
+      "quantum_transition_status": "quantum_vulnerable_public_key",
+      "classical_status": "REVIEW REQUIRED",
+      "policy_status": "NOT ASSESSED: organization-specific policy not supplied",
+      "runtime_use": "NOT CONFIRMED",
+      "scanner": "metadata-parser",
+      "scanner_version": "2.0.0",
+      "rule_id": "ECDAT-CRYPTO",
+      "rule_version": "2.0.0",
+      "limitations": [
+        "Static evidence does not establish runtime use or security."
+      ],
+      "mosca": {
+        "applicable": true,
+        "verdict": "act_now",
+        "x_years": 10.0,
+        "y_years": 3.0,
+        "z_years": 10.0,
+        "margin_years": -3.0,
+        "basis": "Z is an organization-selected planning scenario, not a prediction of Q-Day.",
+        "formula": "Margin = Z - (X + Y); X = required protection lifetime; Y = migration duration"
+      },
+      "risk_score": 100,
+      "alternatives": [
+        "ML-KEM (key establishment)",
+        "ML-DSA (signatures)"
+      ],
+      "migration_effort": "high",
+      "tradeoffs": "Benchmark latency, bandwidth, memory and operating costs before selecting parameters; estimates are not measurements.",
+      "references": [
+        "https://csrc.nist.gov/pubs/fips/203/final",
+        "https://csrc.nist.gov/pubs/fips/204/final",
+        "https://csrc.nist.gov/pubs/fips/205/final"
+      ],
+      "recommendation_explanation": {
+        "recommendation": "Confirm whether this primitive signs or establishes keys. Evaluate ML-DSA for signatures or ML-KEM for key establishment. Candidate migration family. Final selection depends on protocol, interoperability, performance and organizational policy.",
+        "because": [
+          "EC observed",
+          "operation = unknown",
+          "quantum status = quantum_vulnerable_public_key",
+          "Mosca margin = -3.0 years"
+        ],
+        "standard_basis": [
+          "https://csrc.nist.gov/pubs/fips/203/final",
+          "https://csrc.nist.gov/pubs/fips/204/final",
+          "https://csrc.nist.gov/pubs/fips/205/final"
+        ]
+      },
+      "context_source": "user",
+      "planning_priority": {
+        "score": 100,
+        "model": "ECDAT Planning Priority v1",
+        "breakdown": {
+          "temporal": 40,
+          "criticality": 25,
+          "sensitivity": 20,
+          "exposure": 15
+        },
+        "meaning": "Planning Priority Score, not probability of attack and not a security certification."
+      },
+      "migration_priority": "Urgent"
+    },
+    {
+      "algorithm": "ML-DSA",
+      "algorithm_raw": "ML-DSA",
+      "location": "pqc-gateway/Signature.java",
+      "line": 1,
+      "evidence": "Source observation",
+      "scanner": "java-source",
+      "scanner_version": "1.0.0",
+      "rule_id": "ECDAT-CRYPTO",
+      "rule_version": "2.0.0",
+      "priority": "info",
+      "recommendation": "Check configuration and key management. Detection alone does not establish security.",
+      "mode": null,
+      "key_size": null,
+      "curve": null,
+      "provider": null,
+      "operation": "sign",
+      "padding": null,
+      "family": "pqc_sign",
+      "standard_status": "FINAL NIST STANDARD",
+      "normalization_version": "2.0.0",
+      "hash_algorithm": null,
+      "asset_type": "algorithm",
+      "confidence": "observed",
+      "id": "6669788a1b0c22606e607258",
+      "context": {
+        "protection_lifetime_years": 10.0,
+        "migration_years": 3.0,
+        "quantum_horizon_years": 10.0,
+        "criticality": "critical",
+        "exposure": "external",
+        "sensitivity": "restricted",
+        "application_name": "Payment Gateway",
+        "owner": "DemoCorp Security"
+      },
+      "quantum_status": "pqc_standardized",
+      "sensitive_data_risk": "Sensitive-data impact requires usage and configuration review.",
+      "quantum_transition_status": "pqc_standardized",
+      "classical_status": "REVIEW REQUIRED",
+      "policy_status": "NOT ASSESSED: organization-specific policy not supplied",
+      "runtime_use": "NOT CONFIRMED",
+      "limitations": [
+        "Static evidence does not establish runtime use or security."
+      ],
+      "mosca": {
+        "applicable": false,
+        "verdict": "not_applicable",
+        "x_years": 10.0,
+        "y_years": 3.0,
+        "z_years": 10.0,
+        "margin_years": -3.0,
+        "basis": "Z is an organization-selected planning scenario, not a prediction of Q-Day.",
+        "formula": "Margin = Z - (X + Y); X = required protection lifetime; Y = migration duration"
+      },
+      "risk_score": 68,
+      "alternatives": [],
+      "migration_effort": "requires assessment",
+      "tradeoffs": "Benchmark latency, bandwidth, memory and operating costs before selecting parameters; estimates are not measurements.",
+      "references": [],
+      "recommendation_explanation": {
+        "recommendation": "Check configuration and key management. Detection alone does not establish security.",
+        "because": [
+          "ML-DSA observed",
+          "operation = sign",
+          "quantum status = pqc_standardized",
+          "Mosca margin = -3.0 years"
+        ],
+        "standard_basis": []
+      },
+      "context_source": "user",
+      "planning_priority": {
+        "score": 68,
+        "model": "ECDAT Planning Priority v1",
+        "breakdown": {
+          "temporal": 8.0,
+          "criticality": 25,
+          "sensitivity": 20,
+          "exposure": 15
+        },
+        "meaning": "Planning Priority Score, not probability of attack and not a security certification."
+      },
+      "migration_priority": "Monitor"
+    },
+    {
+      "algorithm": "ML-KEM",
+      "algorithm_raw": "ML-KEM",
+      "location": "pqc-gateway/Kem.java",
+      "line": 1,
+      "evidence": "Source observation",
+      "scanner": "java-source",
+      "scanner_version": "1.0.0",
+      "rule_id": "ECDAT-CRYPTO",
+      "rule_version": "2.0.0",
+      "priority": "info",
+      "recommendation": "Check configuration and key management. Detection alone does not establish security.",
+      "mode": null,
+      "key_size": null,
+      "curve": null,
+      "provider": null,
+      "operation": "keygen",
+      "padding": null,
+      "family": "pqc_kem",
+      "standard_status": "FINAL NIST STANDARD",
+      "normalization_version": "2.0.0",
+      "hash_algorithm": null,
+      "asset_type": "algorithm",
+      "confidence": "observed",
+      "id": "76065696a222d40df6885c35",
+      "context": {
+        "protection_lifetime_years": 10.0,
+        "migration_years": 3.0,
+        "quantum_horizon_years": 10.0,
+        "criticality": "critical",
+        "exposure": "external",
+        "sensitivity": "restricted",
+        "application_name": "Payment Gateway",
+        "owner": "DemoCorp Security"
+      },
+      "quantum_status": "pqc_standardized",
+      "sensitive_data_risk": "Sensitive-data impact requires usage and configuration review.",
+      "quantum_transition_status": "pqc_standardized",
+      "classical_status": "REVIEW REQUIRED",
+      "policy_status": "NOT ASSESSED: organization-specific policy not supplied",
+      "runtime_use": "NOT CONFIRMED",
+      "limitations": [
+        "Static evidence does not establish runtime use or security."
+      ],
+      "mosca": {
+        "applicable": false,
+        "verdict": "not_applicable",
+        "x_years": 10.0,
+        "y_years": 3.0,
+        "z_years": 10.0,
+        "margin_years": -3.0,
+        "basis": "Z is an organization-selected planning scenario, not a prediction of Q-Day.",
+        "formula": "Margin = Z - (X + Y); X = required protection lifetime; Y = migration duration"
+      },
+      "risk_score": 68,
+      "alternatives": [],
+      "migration_effort": "requires assessment",
+      "tradeoffs": "Benchmark latency, bandwidth, memory and operating costs before selecting parameters; estimates are not measurements.",
+      "references": [],
+      "recommendation_explanation": {
+        "recommendation": "Check configuration and key management. Detection alone does not establish security.",
+        "because": [
+          "ML-KEM observed",
+          "operation = keygen",
+          "quantum status = pqc_standardized",
+          "Mosca margin = -3.0 years"
+        ],
+        "standard_basis": []
+      },
+      "context_source": "user",
+      "planning_priority": {
+        "score": 68,
+        "model": "ECDAT Planning Priority v1",
+        "breakdown": {
+          "temporal": 8.0,
+          "criticality": 25,
+          "sensitivity": 20,
+          "exposure": 15
+        },
+        "meaning": "Planning Priority Score, not probability of attack and not a security certification."
+      },
+      "migration_priority": "Monitor"
+    },
+    {
+      "algorithm": "RSA",
+      "asset_type": "certificate",
+      "evidence": "Parsed X.509 certificate",
+      "location": "certificates/rsa.pem",
+      "line": null,
+      "priority": "review",
+      "recommendation": "Confirm whether this primitive signs or establishes keys. Evaluate ML-DSA for signatures or ML-KEM for key establishment. Candidate migration family. Final selection depends on protocol, interoperability, performance and organizational policy.",
+      "key_size": 2048,
+      "version": "v3",
+      "subject": "CN=fixture.invalid",
+      "issuer": "CN=fixture.invalid",
+      "serial": "142",
+      "valid_from": "2020-01-01T00:00:00+00:00",
+      "signature_algorithm": "1.2.840.113549.1.1.11",
+      "curve": null,
+      "fingerprint": "a2df913126c478d18eb99fc84371880d5795b729896ddb66622381612dae97ca",
+      "expires_at": "2030-01-01T00:00:00+00:00",
+      "algorithm_raw": "RSA",
+      "family": "asymmetric",
+      "standard_status": "not_applicable",
+      "normalization_version": "2.0.0",
+      "mode": null,
+      "padding": null,
+      "operation": null,
+      "hash_algorithm": null,
+      "confidence": "observed",
+      "id": "304b1cab6031526278446934",
+      "context": {
+        "protection_lifetime_years": 10.0,
+        "migration_years": 3.0,
+        "quantum_horizon_years": 10.0,
+        "criticality": "critical",
+        "exposure": "external",
+        "sensitivity": "restricted",
+        "application_name": "Payment Gateway",
+        "owner": "DemoCorp Security"
+      },
+      "quantum_status": "vulnerable",
+      "sensitive_data_risk": "Potential harvest-now-decrypt-later exposure: confirm this primitive protects confidential data in transit or at rest.",
+      "quantum_transition_status": "quantum_vulnerable_public_key",
+      "classical_status": "ACCEPTABLE PARAMETERS; usage review required",
+      "policy_status": "NOT ASSESSED: organization-specific policy not supplied",
+      "runtime_use": "NOT CONFIRMED",
+      "scanner": "metadata-parser",
+      "scanner_version": "2.0.0",
+      "rule_id": "ECDAT-CRYPTO",
+      "rule_version": "2.0.0",
+      "limitations": [
+        "Static evidence does not establish runtime use or security."
+      ],
+      "mosca": {
+        "applicable": true,
+        "verdict": "act_now",
+        "x_years": 10.0,
+        "y_years": 3.0,
+        "z_years": 10.0,
+        "margin_years": -3.0,
+        "basis": "Z is an organization-selected planning scenario, not a prediction of Q-Day.",
+        "formula": "Margin = Z - (X + Y); X = required protection lifetime; Y = migration duration"
+      },
+      "risk_score": 100,
+      "alternatives": [
+        "ML-KEM (key establishment)",
+        "ML-DSA (signatures)"
+      ],
+      "migration_effort": "high",
+      "tradeoffs": "Benchmark latency, bandwidth, memory and operating costs before selecting parameters; estimates are not measurements.",
+      "references": [
+        "https://csrc.nist.gov/pubs/fips/203/final",
+        "https://csrc.nist.gov/pubs/fips/204/final",
+        "https://csrc.nist.gov/pubs/fips/205/final"
+      ],
+      "recommendation_explanation": {
+        "recommendation": "Confirm whether this primitive signs or establishes keys. Evaluate ML-DSA for signatures or ML-KEM for key establishment. Candidate migration family. Final selection depends on protocol, interoperability, performance and organizational policy.",
+        "because": [
+          "RSA observed",
+          "operation = unknown",
+          "quantum status = quantum_vulnerable_public_key",
+          "Mosca margin = -3.0 years"
+        ],
+        "standard_basis": [
+          "https://csrc.nist.gov/pubs/fips/203/final",
+          "https://csrc.nist.gov/pubs/fips/204/final",
+          "https://csrc.nist.gov/pubs/fips/205/final"
+        ]
+      },
+      "context_source": "user",
+      "planning_priority": {
+        "score": 100,
+        "model": "ECDAT Planning Priority v1",
+        "breakdown": {
+          "temporal": 40,
+          "criticality": 25,
+          "sensitivity": 20,
+          "exposure": 15
+        },
+        "meaning": "Planning Priority Score, not probability of attack and not a security certification."
+      },
+      "migration_priority": "Urgent"
+    },
+    {
+      "algorithm": "RSA",
+      "algorithm_raw": "SHA256withRSA",
+      "location": "payment-service/PaymentService.java",
+      "line": 1,
+      "evidence": "Source observation",
+      "scanner": "java-source",
+      "scanner_version": "1.0.0",
+      "rule_id": "ECDAT-CRYPTO",
+      "rule_version": "2.0.0",
+      "priority": "review",
+      "recommendation": "Evaluate ML-DSA for signatures; consider SLH-DSA where hash-based signatures fit. Candidate migration family. Final selection depends on protocol, interoperability, performance and organizational policy.",
+      "mode": null,
+      "key_size": null,
+      "curve": null,
+      "provider": null,
+      "operation": "sign",
+      "padding": null,
+      "family": "asymmetric",
+      "standard_status": "not_applicable",
+      "normalization_version": "2.0.0",
+      "hash_algorithm": "SHA-256",
+      "asset_type": "algorithm",
+      "confidence": "observed",
+      "id": "bcc7cb0f0da43ee5fb129a30",
+      "context": {
+        "protection_lifetime_years": 10.0,
+        "migration_years": 3.0,
+        "quantum_horizon_years": 10.0,
+        "criticality": "critical",
+        "exposure": "external",
+        "sensitivity": "restricted",
+        "application_name": "Payment Gateway",
+        "owner": "DemoCorp Security"
+      },
+      "quantum_status": "vulnerable",
+      "sensitive_data_risk": "Future signature forgery may affect authenticity and long-lived trust.",
+      "quantum_transition_status": "quantum_vulnerable_public_key",
+      "classical_status": "REVIEW REQUIRED",
+      "policy_status": "NOT ASSESSED: organization-specific policy not supplied",
+      "runtime_use": "NOT CONFIRMED",
+      "limitations": [
+        "Static evidence does not establish runtime use or security."
+      ],
+      "mosca": {
+        "applicable": true,
+        "verdict": "act_now",
+        "x_years": 10.0,
+        "y_years": 3.0,
+        "z_years": 10.0,
+        "margin_years": -3.0,
+        "basis": "Z is an organization-selected planning scenario, not a prediction of Q-Day.",
+        "formula": "Margin = Z - (X + Y); X = required protection lifetime; Y = migration duration"
+      },
+      "risk_score": 100,
+      "alternatives": [
+        "ML-DSA",
+        "SLH-DSA"
+      ],
+      "migration_effort": "medium",
+      "tradeoffs": "Benchmark latency, bandwidth, memory and operating costs before selecting parameters; estimates are not measurements.",
+      "references": [
+        "https://csrc.nist.gov/pubs/fips/203/final",
+        "https://csrc.nist.gov/pubs/fips/204/final",
+        "https://csrc.nist.gov/pubs/fips/205/final"
+      ],
+      "recommendation_explanation": {
+        "recommendation": "Evaluate ML-DSA for signatures; consider SLH-DSA where hash-based signatures fit. Candidate migration family. Final selection depends on protocol, interoperability, performance and organizational policy.",
+        "because": [
+          "RSA observed",
+          "operation = sign",
+          "quantum status = quantum_vulnerable_public_key",
+          "Mosca margin = -3.0 years"
+        ],
+        "standard_basis": [
+          "https://csrc.nist.gov/pubs/fips/203/final",
+          "https://csrc.nist.gov/pubs/fips/204/final",
+          "https://csrc.nist.gov/pubs/fips/205/final"
+        ]
+      },
+      "context_source": "user",
+      "planning_priority": {
+        "score": 100,
+        "model": "ECDAT Planning Priority v1",
+        "breakdown": {
+          "temporal": 40,
+          "criticality": 25,
+          "sensitivity": 20,
+          "exposure": 15
+        },
+        "meaning": "Planning Priority Score, not probability of attack and not a security certification."
+      },
+      "migration_priority": "Urgent"
+    },
+    {
+      "algorithm": "Unknown",
+      "asset_type": "library",
+      "evidence": "Pinned dependency declaration",
+      "location": "container/requirements.txt",
+      "line": null,
+      "priority": "info",
+      "recommendation": "Review actual usage and configuration.",
+      "name": "cryptography",
+      "version": "46.0.5",
+      "algorithm_raw": "Unknown",
+      "family": "unknown",
+      "standard_status": "not_applicable",
+      "normalization_version": "2.0.0",
+      "mode": null,
+      "padding": null,
+      "operation": null,
+      "hash_algorithm": null,
+      "confidence": "observed",
+      "id": "3113ffa88a441c30ac3101be",
+      "context": {
+        "protection_lifetime_years": 10.0,
+        "migration_years": 3.0,
+        "quantum_horizon_years": 10.0,
+        "criticality": "critical",
+        "exposure": "external",
+        "sensitivity": "restricted",
+        "application_name": "Payment Gateway",
+        "owner": "DemoCorp Security"
+      },
+      "quantum_status": "not_assessed",
+      "sensitive_data_risk": "Sensitive-data impact requires usage and configuration review.",
+      "quantum_transition_status": "not_assessed",
+      "classical_status": "REVIEW REQUIRED",
+      "policy_status": "NOT ASSESSED: organization-specific policy not supplied",
+      "runtime_use": "NOT CONFIRMED",
+      "scanner": "metadata-parser",
+      "scanner_version": "2.0.0",
+      "rule_id": "ECDAT-CRYPTO",
+      "rule_version": "2.0.0",
+      "limitations": [
+        "Static evidence does not establish runtime use or security."
+      ],
+      "mosca": {
+        "applicable": false,
+        "verdict": "not_applicable",
+        "x_years": 10.0,
+        "y_years": 3.0,
+        "z_years": 10.0,
+        "margin_years": -3.0,
+        "basis": "Z is an organization-selected planning scenario, not a prediction of Q-Day.",
+        "formula": "Margin = Z - (X + Y); X = required protection lifetime; Y = migration duration"
+      },
+      "risk_score": 68,
+      "alternatives": [],
+      "migration_effort": "requires assessment",
+      "tradeoffs": "Benchmark latency, bandwidth, memory and operating costs before selecting parameters; estimates are not measurements.",
+      "references": [],
+      "recommendation_explanation": {
+        "recommendation": "Review actual usage and configuration.",
+        "because": [
+          "Unknown observed",
+          "operation = unknown",
+          "quantum status = not_assessed",
+          "Mosca margin = -3.0 years"
+        ],
+        "standard_basis": []
+      },
+      "context_source": "user",
+      "planning_priority": {
+        "score": 68,
+        "model": "ECDAT Planning Priority v1",
+        "breakdown": {
+          "temporal": 8.0,
+          "criticality": 25,
+          "sensitivity": 20,
+          "exposure": 15
+        },
+        "meaning": "Planning Priority Score, not probability of attack and not a security certification."
+      },
+      "migration_priority": "Monitor"
+    }
+  ],
+  "finding_count": 11,
+  "review_count": 7,
+  "inspected_files": 11,
+  "skipped_files": 0,
+  "limitations": [
+    "Python and Java use source analysis; other supported languages use string indicators. This scan does not prove the code is secure.",
+    "Metadata parsing is limited to the first 1 MiB per file. Versions, modes and key sizes remain unknown unless observed. Business context is supplied for the application and inherited by its findings."
+  ]
+}

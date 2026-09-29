@@ -11,6 +11,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+NORMALIZATION_VERSION = '2.0.0'
+
 
 @dataclass(frozen=True)
 class NormalizedAlgorithm:
@@ -24,6 +26,8 @@ class NormalizedAlgorithm:
     hash_alg: str | None    # e.g. "SHA-256"
     is_pqc: bool = False    # is this a PQC algorithm?
     is_deprecated: bool = False
+    operation: str | None = None
+    standard_status: str = 'not_applicable'
 
 
 # ---------------------------------------------------------------------------
@@ -31,6 +35,11 @@ class NormalizedAlgorithm:
 # ---------------------------------------------------------------------------
 
 _ALGORITHM_FAMILIES: dict[str, str] = {
+    "EC": "elliptic-curve",
+    "Kyber": "pre-standard/related PQC",
+    "Dilithium": "pre-standard/related PQC",
+    "SPHINCS": "pre-standard/related PQC",
+    "Falcon": "pre-standard/related PQC",
     # Asymmetric
     "RSA": "asymmetric",
     "ECDSA": "asymmetric",
@@ -114,6 +123,9 @@ _ALIASES: dict[str, str] = {
     "pss": "RSA",
     # AES variants
     "aes": "AES",
+    "aes-128": "AES",
+    "aes-192": "AES",
+    "aes-256": "AES",
     "aes-128-cbc": "AES",
     "aes-192-cbc": "AES",
     "aes-256-cbc": "AES",
@@ -137,14 +149,14 @@ _ALIASES: dict[str, str] = {
     "desede/cbc/pkcs5padding": "3DES",
     "des-ede3-cbc": "3DES",
     # EC / ECDSA
-    "ec": "ECDSA",
+    "ec": "EC",
     "ecdsa": "ECDSA",
     "ecdh": "ECDH",
     "ecdhwithsha256": "ECDH",
-    "secp256r1": "ECDSA",
-    "prime256v1": "ECDSA",
-    "secp384r1": "ECDSA",
-    "secp521r1": "ECDSA",
+    "secp256r1": "EC",
+    "prime256v1": "EC",
+    "secp384r1": "EC",
+    "secp521r1": "EC",
     "curve25519": "X25519",
     # SHA
     "sha": "SHA-1",
@@ -171,6 +183,10 @@ _ALIASES: dict[str, str] = {
     "hmacwithsha256": "HMAC",
     "hmacsha256": "HMAC",
     "hmacsha512": "HMAC",
+    "hmacsha1": "HMAC",
+    "hmac-sha1": "HMAC",
+    "hmac-sha-1": "HMAC",
+    "hmacwithsha1": "HMAC",
     # DSA
     "dsa": "DSA",
     # EdDSA
@@ -189,14 +205,15 @@ _ALIASES: dict[str, str] = {
     # PQC
     "ml-kem": "ML-KEM",
     "mlkem": "ML-KEM",
-    "kyber": "ML-KEM",
+    "kyber": "Kyber",
     "ml-dsa": "ML-DSA",
     "mldsa": "ML-DSA",
-    "dilithium": "ML-DSA",
+    "dilithium": "Dilithium",
     "slh-dsa": "SLH-DSA",
-    "sphincs": "SLH-DSA",
+    "sphincs": "SPHINCS",
+    "sphincs+": "SPHINCS",
     "fn-dsa": "FN-DSA",
-    "falcon": "FN-DSA",
+    "falcon": "Falcon",
     # RC4
     "rc4": "RC4",
     "arcfour": "RC4",
@@ -251,6 +268,18 @@ def normalize_algorithm(raw: str) -> NormalizedAlgorithm:
     # Normalize: lowercase, strip spaces
     key = re.sub(r"\s+", "", raw.lower())
     canonical = _ALIASES.get(key)
+    signature = re.fullmatch(r'(sha[-_]?\d+)with(rsa|ecdsa|dsa)', key)
+    if signature:
+        canonical = signature[2].upper()
+    if canonical is None:
+        for name in ('ML-KEM', 'ML-DSA', 'SLH-DSA', 'Kyber', 'Dilithium', 'SPHINCS', 'Falcon'):
+            if re.fullmatch(re.escape(name.lower()) + r'[-_]?(?:\d+|sha2.*|shake.*)', key):
+                canonical = name
+                break
+    if mode is None:
+        match = re.search(r'(?:[-_]|aes)(cbc|ecb|gcm|ctr|ccm|xts)$', key)
+        if match:
+            mode = match[1].upper()
 
     if canonical is None:
         # Try stripping the algorithm part from JCA notation
@@ -277,7 +306,30 @@ def normalize_algorithm(raw: str) -> NormalizedAlgorithm:
         raw=raw,
         mode=mode,
         padding=padding,
-        hash_alg=None,
+        hash_alg=normalize_algorithm(signature[1]).canonical if signature else None,
         is_pqc=is_pqc,
         is_deprecated=is_deprecated,
+        operation='sign' if signature else None,
+        standard_status=('FINAL NIST STANDARD' if canonical in {'ML-KEM', 'ML-DSA', 'SLH-DSA'} else
+                         'SELECTED / IN DEVELOPMENT' if canonical in {'FN-DSA', 'HQC'} else
+                         'PRE-STANDARD; requires verification' if canonical in {'Kyber', 'Dilithium', 'SPHINCS', 'Falcon'} else 'not_applicable'),
     )
+
+
+def normalize_finding(finding: dict) -> None:
+    """Canonicalize before identity, policy and assessment without losing evidence."""
+    raw = finding.get('algorithm_raw') or finding['algorithm']
+    normalized = normalize_algorithm(raw)
+    finding.update(algorithm_raw=raw, algorithm=normalized.canonical,
+                   family=normalized.family, standard_status=normalized.standard_status,
+                   normalization_version=NORMALIZATION_VERSION)
+    parameter = re.fullmatch(re.escape(normalized.canonical) + r'[-_](.+)', raw, re.I)
+    if normalized.canonical in {'ML-KEM', 'ML-DSA', 'SLH-DSA'} and parameter:
+        finding['parameter_set'] = parameter[1]
+    aes_size = re.match(r'(?i)^AES[-_](128|192|256)(?:[-_]|$)', raw)
+    if aes_size and not finding.get('key_size'):
+        finding['key_size'] = int(aes_size[1])
+    for key, value in [('mode', normalized.mode), ('padding', normalized.padding),
+                       ('operation', normalized.operation), ('hash_algorithm', normalized.hash_alg)]:
+        if not finding.get(key):
+            finding[key] = value

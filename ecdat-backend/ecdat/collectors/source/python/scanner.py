@@ -174,7 +174,7 @@ class PythonSourceScanner(CollectorInterface):
                 )
                 envelopes.extend(file_envelopes)
             except Exception as exc:
-                logger.warning("python_scan_file_error", path=str(py_file), error=str(exc))
+                logger.warning("Python source could not be parsed; analysis incomplete.")
                 errors.append(f"{py_file}: {exc}")
 
         return CollectorResult(
@@ -193,10 +193,12 @@ class PythonSourceScanner(CollectorInterface):
         inp: CollectorInput,
     ) -> list[EvidenceEnvelope]:
         source_bytes = py_file.read_bytes()
-        source_str = source_bytes.decode("utf-8", errors="replace")
+        source_str = source_bytes.decode("utf-8")
         relative_path = str(py_file.relative_to(root))
 
         tree = self._parser.parse(source_bytes)
+        if tree.root_node.has_error:
+            raise ValueError("Source contains syntax errors; analysis incomplete.")
         envelopes: list[EvidenceEnvelope] = []
 
         # Collect imports first for context
@@ -228,8 +230,8 @@ class PythonSourceScanner(CollectorInterface):
                     if len(parts) >= 4 and parts[0] == "from" and parts[2] == "import":
                         module = parts[1]
                         for name in " ".join(parts[3:]).split(","):
-                            name = name.strip().split(" as ")[-1].strip()
-                            imports[name] = module
+                            names = name.strip().split(" as ")
+                            imports[names[-1].strip()] = module + '.' + names[0].strip()
                 else:
                     # import X as Y
                     parts = text.replace("import ", "").split(",")
@@ -280,10 +282,27 @@ class PythonSourceScanner(CollectorInterface):
         node_text = source[node.start_byte:node.end_byte].decode("utf-8", errors="replace")
         line = node.start_point[0] + 1
 
+        function = node.child_by_field_name('function')
+        if function is None:
+            return None
+        call = source[function.start_byte:function.end_byte].decode('utf-8', errors='replace')
+        parts = call.split('.')
+        resolved = '.'.join([imports.get(parts[0], parts[0]), *parts[1:]])
+        trusted = resolved.startswith(('cryptography.', 'Crypto.', 'Cryptodome.', 'hashlib.'))
+        if not trusted:
+            return None
+        class_name = resolved.rsplit('.', 1)[-1]
+        extra_algorithms = {'AESGCM': ('AES/GCM/NoPadding', ObservationType.ENCRYPTION),
+                            'ECDH': ('ECDH', ObservationType.KEY_AGREEMENT),
+                            'ECDSA': ('ECDSA', ObservationType.SIGNING)}
+        if class_name in extra_algorithms:
+            alg, obs = extra_algorithms[class_name]
+            return self._make_envelope(path, line, alg, obs, 'PY-' + class_name + '-001', collector_info, run_info, inp, node_text)
+
         # Check for pyca algo class instantiation: AES(...), SHA256(), etc.
         for cls_name, canonical_alg in _PYCA_ALGO_CLASSES.items():
-            if node_text.startswith(f"{cls_name}("):
-                module = imports.get(cls_name, "")
+            if class_name == cls_name:
+                module = resolved.rsplit('.', 1)[0]
                 obs_type = _MODULE_OBS_MAP.get(module, ObservationType.ALGORITHM_USE)
                 return self._make_envelope(
                     path, line, canonical_alg, obs_type, f"PY-{cls_name.upper()}-001",
@@ -292,7 +311,7 @@ class PythonSourceScanner(CollectorInterface):
 
         # hashlib calls: hashlib.sha256(), hashlib.md5(), etc.
         for func, alg in _HASHLIB_FUNCS.items():
-            if f"hashlib.{func}(" in node_text or f".{func}(" in node_text:
+            if resolved == f"hashlib.{func}":
                 if alg:
                     rule_id = f"PY-{alg.replace('-', '').upper()}-001" if alg else "PY-HASH-001"
                     return self._make_envelope(
@@ -301,8 +320,10 @@ class PythonSourceScanner(CollectorInterface):
                     )
 
         # generate_private_key: RSA, EC
-        if "generate_private_key(" in node_text:
-            alg = "RSA" if "rsa" in node_text.lower() else "ECDSA"
+        if class_name == 'generate_private_key':
+            alg = 'RSA' if '.rsa.' in resolved else 'EC' if '.ec.' in resolved else None
+            if alg is None:
+                return None
             return self._make_envelope(
                 path, line, alg, ObservationType.KEY_GENERATION, "PY-RSA-001",
                 collector_info, run_info, inp, node_text,

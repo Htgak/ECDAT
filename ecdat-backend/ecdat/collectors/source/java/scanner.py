@@ -180,7 +180,7 @@ class JavaSourceScanner(CollectorInterface):
                 )
                 envelopes.extend(file_envelopes)
             except Exception as exc:
-                logger.warning("java_scan_file_error", path=str(java_file), error=str(exc))
+                logger.warning("Java source could not be parsed; analysis incomplete.")
                 errors.append(f"{java_file}: {exc}")
 
         return CollectorResult(
@@ -199,10 +199,12 @@ class JavaSourceScanner(CollectorInterface):
         inp: CollectorInput,
     ) -> list[EvidenceEnvelope]:
         source_bytes = java_file.read_bytes()
-        source_str = source_bytes.decode("utf-8", errors="replace")
+        source_str = source_bytes.decode("utf-8")
         relative_path = str(java_file.relative_to(root))
 
         tree = self._parser.parse(source_bytes)
+        if tree.root_node.has_error:
+            raise ValueError("Source contains syntax errors; analysis incomplete.")
         envelopes: list[EvidenceEnvelope] = []
 
         # Walk tree and find method invocations
@@ -261,8 +263,14 @@ class JavaSourceScanner(CollectorInterface):
         node_text = source[node.start_byte:node.end_byte].decode("utf-8", errors="replace")
 
         # Look for pattern: ClassName.getInstance("ALGORITHM")
+        object_node = node.child_by_field_name('object')
+        method_node = node.child_by_field_name('name')
+        if object_node is None or method_node is None:
+            return None
+        receiver = source[object_node.start_byte:object_node.end_byte].decode('utf-8')
+        method = source[method_node.start_byte:method_node.end_byte].decode('utf-8')
         for class_name, obs_type in _JCA_FACTORY_CLASSES.items():
-            if f"{class_name}.getInstance" in node_text:
+            if receiver.rsplit('.', 1)[-1] == class_name and method == 'getInstance':
                 # Extract algorithm string
                 alg_match = _ALG_PATTERN.search(node_text)
                 if not alg_match:

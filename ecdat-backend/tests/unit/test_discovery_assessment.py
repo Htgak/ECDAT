@@ -22,7 +22,7 @@ def tar(entries):
     return out.getvalue()
 
 
-@pytest.mark.parametrize('x,verdict', [(9, 'act_now'), (8, 'monitor'), (1, 'within_horizon')])
+@pytest.mark.parametrize('x,verdict', [(9, 'act_now'), (8, 'act_now'), (7, 'monitor'), (1, 'within_horizon')])
 def test_mosca_boundaries(x, verdict):
     findings = [dict(algorithm='RSA', location='a', evidence='String indicator')]
     enrich(findings, dict(data_lifetime_years=x, migration_years=2, quantum_horizon_years=10, sensitivity="confidential"))

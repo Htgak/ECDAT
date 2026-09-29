@@ -54,3 +54,11 @@
 .repository-origin { overflow-wrap: anywhere; }
 @media (max-width: 1100px) { .scan-workspace .file-type-options { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 520px) { .scan-workspace .file-type-options { grid-template-columns: 1fr; } }
+.posture-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 12px; margin-top: 20px; }
+.posture-grid > div { display: flex; flex-direction: column; padding: 16px; border: 1px solid var(--border-color, #ccd5da); border-radius: 10px; }
+.posture-grid strong { font-size: 1.7rem; }
+.posture-grid span { font-size: .85rem; margin-top: 5px; }
+.coverage-panel { padding: 20px; margin: 20px 0; border-left: 4px solid #b68a36; background: var(--bg-secondary, #f4f5f6); border-radius: 8px; }
+.evidence-first { margin: 24px 0; overflow-wrap: anywhere; }
+.evidence-first h3 { margin: 22px 0 12px; font-size: 1rem; }
+.evidence-first dd { white-space: normal; }

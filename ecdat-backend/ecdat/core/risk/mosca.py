@@ -1,9 +1,11 @@
+# Legacy research model, not used by the website or CLI discovery assessment.
+# The authoritative product model is ecdat.core.discovery.assessment.
 """Mosca theorem and QARS (Quantum Asset Risk Score) implementation.
 
-Mosca theorem: If X + Y > Z, act now.
-  X = data lifetime (years protection needed)
+Mosca timing rule: If X + Y >= Z, act now.
+  X = required protection lifetime (years protection needed)
   Y = migration time (years to deploy PQC)
-  Z = time to cryptographically relevant quantum computer (years)
+  Z = organization-selected quantum threat horizon (not a prediction)
 
 QARS = weighted combination of:
   - Temporal risk (Mosca verdict)
@@ -32,7 +34,7 @@ class MoscaScenario:
 
     label: str             # "conservative" | "central" | "optimistic"
     z_years: float         # estimated years to CRQC
-    x_years: float         # data lifetime (years)
+    x_years: float         # required protection lifetime (years)
     y_years: float         # migration time (years)
     result: float          # x + y - z (positive = act now)
     verdict: MoscaVerdict
@@ -48,7 +50,7 @@ class MoscaResult:
     z_central: float        # central estimate: 10 years
     z_optimistic: float     # optimistic: 15 years
 
-    x_value: float          # data lifetime (years)
+    x_value: float          # required protection lifetime (years)
     x_source: str           # e.g. "explicit", "default_HIPAA", "user_override"
 
     y_value: float          # migration time
@@ -103,26 +105,8 @@ class QARSResult:
 # Z-value assumptions (configurable, used as defaults)
 # ---------------------------------------------------------------------------
 
-DEFAULT_Z_CONSERVATIVE = 5.0    # NIST pessimistic
-DEFAULT_Z_CENTRAL = 10.0        # current expert consensus
-DEFAULT_Z_OPTIMISTIC = 15.0     # optimistic estimate
-
-# ---------------------------------------------------------------------------
-# Y-value estimates by asset type (years to migrate)
-# ---------------------------------------------------------------------------
-
-Y_ESTIMATES: dict[str, dict[str, float]] = {
-    "RSA": {"min": 1.0, "max": 5.0, "central": 3.0},
-    "ECDSA": {"min": 1.0, "max": 4.0, "central": 2.5},
-    "ECDH": {"min": 1.0, "max": 4.0, "central": 2.5},
-    "EdDSA": {"min": 0.5, "max": 2.0, "central": 1.0},
-    "Ed25519": {"min": 0.5, "max": 2.0, "central": 1.0},
-    "DH": {"min": 2.0, "max": 6.0, "central": 4.0},
-    "AES": {"min": 0.5, "max": 2.0, "central": 1.0},  # just double key size
-    "SHA-256": {"min": 0.5, "max": 1.5, "central": 0.5},  # use SHA-512 or SHA3
-    "SHA-1": {"min": 0.5, "max": 2.0, "central": 1.0},
-    "default": {"min": 1.0, "max": 5.0, "central": 3.0},
-}
+# No generic migration-duration estimates or quantum-arrival defaults.
+# Callers must supply both Y and Z explicitly.
 
 # ---------------------------------------------------------------------------
 # Criticality → sensitivity score
@@ -163,30 +147,26 @@ class MoscaEngine:
 
         Args:
             algorithm: Canonical algorithm name (e.g. "RSA").
-            x_years: Data lifetime in years.
+            x_years: Required protection lifetime in years.
             x_source: Source/justification for X value.
-            y_override: Override Y value (years to migrate). Uses table default if None.
+            y_override: Override Y value (years to migrate). Required; no default is inferred.
 
         Returns:
             MoscaResult with conservative/central/optimistic scenarios.
         """
-        y_table = Y_ESTIMATES.get(algorithm, Y_ESTIMATES["default"])
-        y_value = y_override if y_override is not None else y_table["central"]
-        y_min = y_override if y_override is not None else y_table["min"]
-        y_max = y_override if y_override is not None else y_table["max"]
-
+        if y_override is None or z_override is None:
+            raise ValueError('NOT ASSESSED: organization-supplied migration duration Y and planning horizon Z are required.')
+        from math import isfinite
+        if not all(isfinite(v) for v in (x_years, y_override, z_override)) or x_years < 0 or y_override < 0 or z_override <= 0:
+            raise ValueError('X/Y must be finite and non-negative; Z must be finite and positive.')
+        y_value = y_min = y_max = y_override
         scenarios = []
-        for label, z in [
-            ("conservative", DEFAULT_Z_CONSERVATIVE),
-            ("central", DEFAULT_Z_CENTRAL),
-            ("optimistic", DEFAULT_Z_OPTIMISTIC),
-        ]:
-            if z_override is not None:
-                z = z_override
+        # Retain three legacy result slots, all using the explicitly selected scenario.
+        for label, z in [('conservative', z_override), ('central', z_override), ('optimistic', z_override)]:
             result = x_years + y_value - z
-            margin = abs(z - (x_years + y_value))
+            margin = z - (x_years + y_value)
 
-            if result > 0:
+            if result >= 0:
                 verdict = MoscaVerdict.ACT_NOW
             elif margin <= 2.0:
                 verdict = MoscaVerdict.MONITOR
@@ -204,15 +184,15 @@ class MoscaEngine:
             ))
 
         return MoscaResult(
-            z_conservative=z_override if z_override is not None else DEFAULT_Z_CONSERVATIVE,
-            z_central=z_override if z_override is not None else DEFAULT_Z_CENTRAL,
-            z_optimistic=z_override if z_override is not None else DEFAULT_Z_OPTIMISTIC,
+            z_conservative=z_override,
+            z_central=z_override,
+            z_optimistic=z_override,
             x_value=x_years,
             x_source=x_source,
             y_value=y_value,
             y_min=y_min,
             y_max=y_max,
-            y_source="migration_estimate_v1.0" if y_override is None else "user_override",
+            y_source="user_override",
             scenarios=scenarios,
         )
 

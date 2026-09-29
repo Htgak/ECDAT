@@ -81,6 +81,8 @@ class CycloneDX17Exporter:
                 {"name": "ecdat:merkle_root", "value": merkle}
             ]
 
+        from ecdat.integrations.validation import validate_document
+        validate_document(doc, 'bom-1.7.schema.json')
         return doc
 
     def export_json(
@@ -150,7 +152,7 @@ class CycloneDX17Exporter:
                 "occurrences": [
                     {
                         "location": self._occurrence_location_string(occ),
-                        "line": occ.get("line"),
+                        **({"line": occ["line"]} if occ.get("line") else {}),
                     }
                     for occ in occurrences
                 ]
@@ -190,7 +192,9 @@ class CycloneDX17Exporter:
             if asset.get("curve"):
                 props["algorithmProperties"]["curve"] = asset["curve"]
 
-        props["oid"] = self._algorithm_oid(alg or "")
+        oid = self._algorithm_oid(alg or "")
+        if oid:
+            props["oid"] = oid
         return props
 
     def _map_asset_type(self, asset_type: str) -> str:
@@ -205,34 +209,34 @@ class CycloneDX17Exporter:
     def _map_primitive(self, algorithm: str) -> str:
         alg_upper = algorithm.upper()
         if "RSA" in alg_upper:
-            return "public-key-encryption"
+            return "pke"
         if "AES" in alg_upper:
-            return "symmetric-encryption"
+            return "block-cipher"
         if "ECDSA" in alg_upper or "DSA" in alg_upper or "ML-DSA" in alg_upper:
             return "signature"
-        if "ECDH" in alg_upper or "ML-KEM" in alg_upper:
+        if "ML-KEM" in alg_upper:
+            return "kem"
+        if "ECDH" in alg_upper:
             return "key-agree"
-        if "SHA" in alg_upper or "MD" in alg_upper or "BLAKE" in alg_upper:
+        if ("SHA" in alg_upper or "MD" in alg_upper or "BLAKE" in alg_upper) and not ("HMAC" in alg_upper or "PBKDF" in alg_upper):
             return "hash"
         if "HMAC" in alg_upper or "CMAC" in alg_upper:
             return "mac"
         if "PBKDF" in alg_upper or "HKDF" in alg_upper or "SCRYPT" in alg_upper:
-            return "key-derivation"
+            return "kdf"
         return "unknown"
 
     def _algorithm_oid(self, algorithm: str) -> str | None:
         # Common OIDs for display purposes
         oids = {
             "RSA": "1.2.840.113549.1.1.1",
-            "ECDSA": "1.2.840.10045.4.3.2",
-            "AES": "2.16.840.1.101.3.4.1",
+
             "SHA-256": "2.16.840.1.101.3.4.2.1",
             "SHA-384": "2.16.840.1.101.3.4.2.2",
             "SHA-512": "2.16.840.1.101.3.4.2.3",
             "SHA-1": "1.3.14.3.2.26",
             "MD5": "1.2.840.113549.2.5",
-            "ML-KEM": "2.16.840.1.101.3.4.4.1",
-            "ML-DSA": "2.16.840.1.101.3.4.3.17",
+
         }
         return oids.get(algorithm)
 

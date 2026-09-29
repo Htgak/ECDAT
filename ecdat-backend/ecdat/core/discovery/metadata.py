@@ -42,6 +42,10 @@ def discover(data: bytes, location: str) -> list[dict]:
             cert = x509.load_pem_x509_certificate(raw) if raw.startswith(b'-----') else x509.load_der_x509_certificate(raw)
             algorithm, size = key_info(cert.public_key())
             add(algorithm, 'certificate', 'Parsed X.509 certificate', key_size=size, version=cert.version.name,
+                subject=cert.subject.rfc4514_string(), issuer=cert.issuer.rfc4514_string(),
+                serial=str(cert.serial_number), valid_from=cert.not_valid_before_utc.isoformat(),
+                signature_algorithm=cert.signature_algorithm_oid.dotted_string,
+                curve=getattr(getattr(cert.public_key(), 'curve', None), 'name', None),
                 fingerprint=cert.fingerprint(hashes.SHA256()).hex(), expires_at=cert.not_valid_after_utc.isoformat())
         except ValueError:
             pass

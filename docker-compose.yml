@@ -14,12 +14,17 @@ services:
       dockerfile: Dockerfile
     image: ecdat-backend:latest
     container_name: ecdat-backend
-    command: uv run uvicorn ecdat.apps.api.main:app --host 0.0.0.0 --port 8000
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 2g
+    cpus: 2
+    pids_limit: 256
+    command: /app/.venv/bin/uvicorn ecdat.apps.api.main:app --host 0.0.0.0 --port 8000
     ports:
       - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
     volumes:
       - evidence_store:/evidence_store
-      - ./ecdat-backend/ecdat:/app/ecdat
+      - ./ecdat-backend/ecdat:/app/ecdat:ro
     environment:
       EVIDENCE_STORE_PATH: /evidence_store
       ENVIRONMENT: ${ENVIRONMENT:-production}
