@@ -24,6 +24,8 @@
 **/*.log
 ecdat-web/artifacts/*.png
 ecdat-web/artifacts/*.zip
+ecdat-web/artifacts/upload-fixtures/
+*.exe
 # Local scan reports may contain sensitive source evidence
 /scan-report.json
 

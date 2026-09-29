@@ -1,4 +1,5 @@
 import { readJson } from '../api/response';
+import { API_BASE } from '../api/client';
 import { ThemeToggle } from './ThemeToggle';
 import { useEffect, useState, type ReactNode, type FormEvent } from 'react';
 
@@ -15,7 +16,7 @@ export function WorkspaceAccess({ children }: { children: ReactNode }) {
     let active = true;
     const check = async () => {
       try {
-        const response = await fetch('/api/v1/session');
+        const response = await fetch(`${API_BASE}/session`);
         if (!response.ok) throw new Error();
         const state = await readJson(response);
         if (active) { setUser(state.authenticated ? state.user : null); setError(''); }
@@ -31,7 +32,7 @@ export function WorkspaceAccess({ children }: { children: ReactNode }) {
   async function login(event: FormEvent) {
     event.preventDefault(); setBusy(true); setError('');
     try {
-      const response = await fetch('/api/v1/session', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+      const response = await fetch(`${API_BASE}/session`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
       const state = await readJson(response);
       if (!response.ok) throw new Error(typeof state.detail === 'string' ? state.detail : 'Sign-in failed. Check your username and password.');
       setUser(state.user); setPassword('');
@@ -41,7 +42,7 @@ export function WorkspaceAccess({ children }: { children: ReactNode }) {
   async function logout() {
     setBusy(true);
     try {
-      const response = await fetch('/api/v1/session',{method:'DELETE'});
+      const response = await fetch(`${API_BASE}/session`,{method:'DELETE'});
       if (!response.ok) throw new Error();
       setUser(null); setPassword(''); setError('');
     } catch { setError('Sign-out failed. Please retry.'); }

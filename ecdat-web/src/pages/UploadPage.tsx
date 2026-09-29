@@ -1,4 +1,5 @@
 import { readJson } from '../api/response';
+import { API_BASE } from '../api/client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AndroidLogo, ArrowLeft, ArrowRight, Check, Code, DownloadSimple, File, FileArrowUp, FolderSimple, GitBranch, SpinnerGap, WindowsLogo, X } from '@phosphor-icons/react';
@@ -66,12 +67,12 @@ export function UploadPage() {
   const selected = options.find(option => option.kind === kind)!;
   useEffect(() => {
     const controller = new AbortController();
-    request<{max_upload_bytes: number}>('/api/v1/uploads/config', {signal: controller.signal}).then(config => setMaxUploadBytes(config.max_upload_bytes)).catch(() => {});
+    request<{max_upload_bytes: number}>(`${API_BASE}/uploads/config`, {signal: controller.signal}).then(config => setMaxUploadBytes(config.max_upload_bytes)).catch(() => {});
     return () => controller.abort();
   }, []);
   const maxUploadLabel = `${Math.round(maxUploadBytes / 1024 / 1024)} MB`;
   const loadScans = useCallback((signal?: AbortSignal) =>
-    request<FileScan[]>('/api/v1/uploads', { signal }).then(records => {
+    request<FileScan[]>(`${API_BASE}/uploads`, { signal }).then(records => {
       if (!signal?.aborted) { setScans(records); setListError(''); }
     }).catch(err => {
       if (!signal?.aborted) setListError(err instanceof Error ? err.message : 'Could not load saved scans.');
@@ -89,7 +90,7 @@ export function UploadPage() {
     let timer: ReturnType<typeof setTimeout>;
     const load = async () => {
       try {
-        const record = await request<FileScan>(`/api/v1/uploads/${scanId}`, { signal: controller.signal });
+        const record = await request<FileScan>(`${API_BASE}/uploads/${scanId}`, { signal: controller.signal });
         if (controller.signal.aborted) return;
         setResult(record); setResultError('');
         if (record.status === 'queued' || record.status === 'scanning') timer = setTimeout(load, 1500);
@@ -114,7 +115,7 @@ export function UploadPage() {
     if (uploading) return;
     setUploading(true); setError('');
     try {
-      const record = await request<FileScan>('/api/v1/uploads/repository', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({url: repositoryUrl.trim(), ref: repositoryRef.trim(), context: suppliedContext})});
+      const record = await request<FileScan>(`${API_BASE}/uploads/repository`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({url: repositoryUrl.trim(), ref: repositoryRef.trim(), context: suppliedContext})});
       setResult(record); setReviewOnly(false); void loadScans(); navigate(`/scans/${record.id}`);
     } catch (err) { setError(err instanceof Error ? err.message : 'Could not start the repository scan.'); }
     finally { setUploading(false); }
@@ -124,7 +125,7 @@ export function UploadPage() {
     setUploading(true); setError(''); setProgress(0);
     const body = new FormData(); body.append('kind', kind); body.append('file', file); body.append('context', JSON.stringify(suppliedContext));
     const xhr = new XMLHttpRequest(); transfer.current = xhr;
-    xhr.open('POST', '/api/v1/uploads'); xhr.timeout = 900000;
+    xhr.open('POST', `${API_BASE}/uploads`); xhr.timeout = 900000;
     xhr.upload.onprogress = event => { if (event.lengthComputable) setProgress(Math.round(event.loaded / event.total * 100)); };
     xhr.onload = () => {
       setUploading(false);
@@ -140,7 +141,7 @@ export function UploadPage() {
   }
   const current = result?.id === scanId ? result : null;
   const findings = (current?.findings || []).filter(f => (!reviewOnly || f.priority === 'review') && (riskFilter === 'all' || f.mosca?.verdict === riskFilter) && `${f.algorithm} ${f.location} ${f.asset_type}`.toLowerCase().includes(query.toLowerCase()));
-  const artifact = (name: string) => `/api/v1/uploads/${scanId}/artifacts/${name}`;
+  const artifact = (name: string) => `${API_BASE}/uploads/${scanId}/artifacts/${name}`;
 
   return <div className="scan-workspace">
     <div className="scan-page-navigation"><div><span className="eyebrow">DISCOVERY</span><h1 className="page-title">Discovery scans</h1><p className="page-subtitle">Upload a file, review the findings, and keep the evidence together.</p></div><a className="btn btn-secondary" href="#saved-scans"><FolderSimple size={17} />Saved scans</a></div>

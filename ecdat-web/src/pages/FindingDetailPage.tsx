@@ -1,4 +1,5 @@
 import { readJson } from '../api/response';
+import { API_BASE } from '../api/client';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
@@ -12,7 +13,7 @@ export function FindingDetailPage() {
     const controller = new AbortController();
     async function load() {
       try {
-        const response = await fetch(`/api/v1/workspace/assets/${id}`, {signal:controller.signal, headers: {}});
+        const response = await fetch(`${API_BASE}/workspace/assets/${id}`, {signal:controller.signal, headers: {}});
         const result = await readJson(response);
         if (!controller.signal.aborted) {setData(result); setError('');}
       } catch (err) { if (!controller.signal.aborted) setError(err instanceof Error ? err.message : 'Could not load finding.'); }

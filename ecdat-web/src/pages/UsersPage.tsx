@@ -1,10 +1,11 @@
 import { readJson } from '../api/response';
+import { API_BASE } from '../api/client';
 import { useEffect, useState, type FormEvent } from 'react';
 import { useWorkspaceUser } from '../components/WorkspaceUserContext';
 
 type Account = {id:string; username:string; role:string; active:boolean; source:string};
 async function request(path:string, init?:RequestInit) {
-  const response=await fetch('/api/v1/admin/users'+path,init);
+  const response=await fetch(`${API_BASE}/admin/users`+path,init);
   if(response.status===401)window.dispatchEvent(new Event('workspace-auth-expired'));
   const data=await readJson(response);
   if(!response.ok)throw new Error(typeof data.detail==='string'?data.detail:'Check the submitted account details.');

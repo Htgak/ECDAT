@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DownloadSimple, ArrowRight, FileCode, Table } from '@phosphor-icons/react';
+import { API_BASE } from '../api/client';
 const formats = [
   {id:'cyclonedx',title:'Cryptography bill of materials',label:'CycloneDX 1.6',description:'Cryptographic assets and their discovery locations in CBOM format.',file:'ecdat-inventory.cdx.json',icon:FileCode},
   {id:'sarif',title:'Source findings',label:'SARIF 2.1',description:'Discovery observations for compatible code analysis tools.',file:'ecdat-inventory.sarif',icon:FileCode},
@@ -12,7 +13,7 @@ export function ExportCenterPage() {
   async function download(format: typeof formats[number]) {
     setBusy(format.id);setError('');
     try {
-      const response=await fetch(`/api/v1/workspace/export/${format.id}`, { headers: {} });
+      const response=await fetch(`${API_BASE}/workspace/export/${format.id}`, { headers: {} });
       if(response.status===401) window.dispatchEvent(new Event('workspace-auth-expired'));
       if(response.headers.get('content-type')?.includes('text/html')) throw new Error('The API returned a web page instead of a report. Check the backend and frontend proxy.');
       if(!response.ok) throw new Error('Could not generate the report. Please try again.');
