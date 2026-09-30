@@ -68,6 +68,9 @@ ENV ECDAT_GIT_COMMIT=${ECDAT_GIT_COMMIT}
 ENV PYTHONPATH=/app
 ENV UV_COMPILE_BYTECODE=1
 ENV PYTHONUNBUFFERED=1
+# Standalone deployments do not inherit docker-compose.yml environment values.
+# Point both SQLite auth and scan storage at the directory owned by UID 10001.
+ENV EVIDENCE_STORE_PATH=/evidence_store
 
 RUN groupadd --gid 10001 ecdat && useradd --uid 10001 --gid 10001 --create-home ecdat && \
     mkdir -p /evidence_store && chown 10001:10001 /evidence_store && chmod 700 /evidence_store
